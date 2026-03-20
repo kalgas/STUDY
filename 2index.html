@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronograma TJ-BA · Magistratura 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0d0d0d;--paper:#f6f1e9;--cream:#ece6d8;
+  --red:#b83020;--blue:#1a4a96;--gold:#8a6400;
+  --green:#1a6630;--teal:#0c6464;--purple:#5a1a78;
+  --orange:#b85000;--muted:#7a7060;--border:#c4bba4;--white:#fff;
+  --g1:#d4ecf8;--g2:#fde8cc;--g3:#d4f0dc;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--paper);color:var(--ink);font-family:"Syne",sans-serif;min-height:100vh;}
+header{background:var(--ink);color:var(--paper);padding:.9rem 1.4rem;position:sticky;top:0;z-index:300;display:flex;align-items:center;justify-content:space-between;gap:.8rem;border-bottom:3px solid var(--red);}
+.hl h1{font-family:"DM Serif Display",serif;font-size:clamp(.82rem,2vw,1.35rem);line-height:1.15;}
+.hl h1 em{color:var(--red);font-style:normal;}
+.hl-sub{font-family:"DM Mono",monospace;font-size:.57rem;color:#a09070;margin-top:2px;letter-spacing:.04em;}
+.hr{display:flex;align-items:center;gap:.65rem;flex-shrink:0;}
+.badge{background:var(--red);color:#fff;padding:.24rem .65rem;border-radius:3px;font-family:"DM Mono",monospace;font-size:.66rem;font-weight:600;white-space:nowrap;}
+#hd-date{font-family:"DM Mono",monospace;font-size:.58rem;color:#a09070;text-align:right;}
+nav{background:var(--cream);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;padding:0 1rem;scrollbar-width:none;}
+nav::-webkit-scrollbar{display:none;}
+.tab{padding:.75rem .9rem;font-family:"DM Mono",monospace;font-size:.64rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;margin-bottom:-2px;}
+.tab:hover{color:var(--ink);}.tab.active{color:var(--ink);border-bottom-color:var(--red);}
+.content{padding:1.2rem 1rem;max-width:1480px;margin:0 auto;}
+.panel{display:none;}.panel.active{display:block;}
+/* progress */
+.pb-row{display:flex;align-items:center;gap:.4rem;font-family:"DM Mono",monospace;font-size:.58rem;color:var(--muted);flex-shrink:0;}
+.pb{width:70px;height:4px;background:rgba(0,0,0,.1);border-radius:3px;overflow:hidden;}
+.pbf{height:100%;background:var(--green);border-radius:3px;transition:width .4s;}
+.gprog{background:var(--cream);border:2px solid var(--border);border-radius:4px;padding:.8rem 1rem;margin-bottom:1.1rem;display:flex;align-items:center;gap:.9rem;flex-wrap:wrap;}
+.gp-pct{font-family:"DM Serif Display",serif;font-size:1.5rem;color:var(--teal);line-height:1;}
+.gp-bar{flex:1;min-width:80px;height:8px;background:rgba(0,0,0,.07);border-radius:4px;overflow:hidden;}
+.gp-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:4px;transition:width .5s;}
+.gp-lbl{font-family:"DM Mono",monospace;font-size:.63rem;color:var(--muted);white-space:nowrap;}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.7rem;margin-bottom:1.1rem;}
+.stat{border:2px solid var(--border);padding:.75rem .9rem;border-radius:4px;background:var(--white);}
+.sv{font-family:"DM Serif Display",serif;font-size:1.6rem;color:var(--red);line-height:1;margin-bottom:.1rem;}
+.sv.g{color:var(--green);}.sl{font-family:"DM Mono",monospace;font-size:.56rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+/* today banner */
+.tbanner{background:var(--teal);color:#fff;padding:.8rem 1rem;border-radius:4px;margin-bottom:1rem;}
+.tbanner h3{font-family:"DM Serif Display",serif;font-size:.95rem;margin-bottom:.2rem;}
+.tbanner p{font-family:"DM Mono",monospace;font-size:.6rem;opacity:.85;margin-bottom:.45rem;}
+.tlist{display:flex;flex-direction:column;gap:.2rem;}
+.ti{background:rgba(255,255,255,.15);padding:.2rem .5rem;border-radius:2px;font-family:"DM Mono",monospace;font-size:.6rem;line-height:1.3;}
+/* blocks legend */
+.blocks-legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:.65rem;margin-bottom:1.1rem;}
+.blk{border:2px solid var(--border);border-radius:4px;padding:.6rem .85rem;background:var(--white);display:flex;align-items:center;gap:.6rem;}
+.blk-n{font-family:"DM Serif Display",serif;font-size:1.7rem;line-height:1;flex-shrink:0;}
+.n-r{color:var(--red);}.n-g{color:var(--green);}.n-b{color:var(--blue);}.n-p{color:var(--purple);}
+.blk-info .bl-time{font-family:"DM Mono",monospace;font-size:.56rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.12rem;}
+.blk-info .bl-desc{font-size:.72rem;font-weight:700;line-height:1.25;}
+/* filters */
+.filters{display:flex;align-items:center;gap:.5rem;margin-bottom:.85rem;flex-wrap:wrap;}
+.filters label{font-family:"DM Mono",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.mfb{font-family:"DM Mono",monospace;font-size:.58rem;padding:.24rem .58rem;border:2px solid var(--border);border-radius:3px;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s;}
+.mfb.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+.mfb:hover:not(.active){border-color:var(--teal);color:var(--teal);}
+.filters input[type=text]{font-family:"DM Mono",monospace;font-size:.7rem;padding:.28rem .58rem;border:2px solid var(--border);background:var(--paper);color:var(--ink);border-radius:2px;width:190px;}
+.btn{font-family:"DM Mono",monospace;font-size:.6rem;padding:.3rem .75rem;background:transparent;border:2px solid var(--border);cursor:pointer;border-radius:2px;transition:all .18s;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+.btn:hover{border-color:var(--ink);color:var(--ink);}.btn.d:hover{border-color:var(--red);color:var(--red);}
+/* cards */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.9rem;}
+.card{border:2px solid var(--border);border-radius:5px;overflow:hidden;background:var(--white);transition:box-shadow .18s;display:flex;flex-direction:column;}
+.card:hover{box-shadow:0 3px 12px rgba(0,0,0,.09);}
+.card.done-card{opacity:.5;}
+.card.today-card{border-color:var(--teal);box-shadow:0 0 0 3px rgba(12,100,100,.14);}
+.card.has-pend{border-left:4px solid var(--orange);}
+/* card header */
+.card-hd{padding:.48rem .72rem;background:var(--cream);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.35rem;}
+.card.today-card .card-hd{background:var(--teal);color:#fff;}
+.card.today-card .card-wd{color:rgba(255,255,255,.72);}
+.day-bub{width:22px;height:22px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-size:.52rem;font-weight:700;flex-shrink:0;}
+.card.today-card .day-bub{background:rgba(255,255,255,.22);}
+.card.has-pend .day-bub{background:var(--orange);}
+.card-date{font-family:"DM Mono",monospace;font-size:.63rem;font-weight:700;}
+.card-wd{font-family:"DM Mono",monospace;font-size:.54rem;color:var(--muted);}
+/* card body */
+.card-body{padding:.48rem .62rem .55rem;flex:1;}
+.sb{margin-bottom:.5rem;}.sb:last-child{margin-bottom:0;}
+.sb-hd{display:flex;align-items:center;gap:.38rem;padding:.18rem .38rem;border-radius:3px;margin-bottom:.24rem;}
+.sb-hd.q{background:#fde0d8;}.sb-hd.l{background:#ceebd8;}.sb-hd.j{background:#cce0f5;}.sb-hd.r{background:#fdf0cc;}
+.sb-n{font-family:"DM Serif Display",serif;font-size:.9rem;line-height:1;flex-shrink:0;}
+.sb-hd.q .sb-n{color:var(--red);}.sb-hd.l .sb-n{color:var(--green);}.sb-hd.j .sb-n{color:var(--blue);}.sb-hd.r .sb-n{color:var(--gold);}
+.sb-ttl{font-family:"DM Mono",monospace;font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.sb-hd.q .sb-ttl{color:var(--red);}.sb-hd.l .sb-ttl{color:var(--green);}.sb-hd.j .sb-ttl{color:var(--blue);}.sb-hd.r .sb-ttl{color:var(--gold);}
+.sb-time{font-family:"DM Mono",monospace;font-size:.52rem;color:var(--muted);margin-left:auto;}
+.sb-items{display:flex;flex-direction:column;gap:.2rem;padding:0 .18rem;}
+.it{display:flex;align-items:flex-start;gap:.26rem;cursor:pointer;padding:.24rem .32rem;border-radius:3px;transition:background .12s;border-left:2px solid var(--teal);}
+.it.lei{border-left-color:var(--teal);}.it.quest{border-left-color:var(--red);}
+.it.juris{border-left-color:var(--blue);}.it.rev{border-left-color:var(--gold);}
+.it:hover{background:rgba(0,0,0,.03);}.it.done{opacity:.28;text-decoration:line-through;}
+.ck{width:10px;height:10px;border:2px solid currentColor;border-radius:2px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:.4rem;color:#fff;transition:all .14s;}
+.it.done .ck{background:var(--green);border-color:var(--green);}.it.done .ck::after{content:"✓";}
+.it-txt{font-size:.62rem;line-height:1.35;font-weight:600;}
+.it.lei .it-txt{color:var(--teal);}.it.quest .it-txt{color:var(--red);}
+.it.juris .it-txt{color:var(--blue);}.it.rev .it-txt{color:var(--gold);}
+/* pendencias */
+.pend-section{padding:.45rem .68rem .55rem;border-top:2px dashed rgba(184,80,0,.22);background:rgba(184,80,0,.025);}
+.pend-label{font-family:"DM Mono",monospace;font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange);margin-bottom:.28rem;display:flex;align-items:center;gap:.3rem;}
+.pend-textarea{width:100%;min-height:58px;max-height:200px;resize:vertical;font-family:"DM Mono",monospace;font-size:.65rem;line-height:1.55;color:var(--ink);background:rgba(255,255,255,.7);border:1.5px solid rgba(184,80,0,.25);border-radius:3px;padding:.35rem .45rem;outline:none;transition:border-color .2s,background .2s;box-sizing:border-box;}
+.pend-textarea:focus{border-color:var(--orange);background:#fff;box-shadow:0 0 0 2px rgba(184,80,0,.1);}
+.pend-textarea::placeholder{color:var(--muted);opacity:.5;font-style:italic;}
+.pend-status{font-family:"DM Mono",monospace;font-size:.5rem;color:var(--green);height:.7rem;transition:opacity .35s;opacity:0;margin-top:.12rem;}
+.pend-status.show{opacity:1;}
+/* card footer */
+.card-ft{padding:.35rem .68rem .45rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.35rem;background:rgba(0,0,0,.015);}
+.mark-btn{font-family:"DM Mono",monospace;font-size:.55rem;padding:.2rem .55rem;border:1px solid var(--border);border-radius:2px;background:transparent;cursor:pointer;color:var(--muted);transition:all .15s;}
+.mark-btn:hover{border-color:var(--green);color:var(--green);}
+/* monthly calendar */
+.msel{display:flex;align-items:center;gap:.6rem;margin-bottom:1.1rem;flex-wrap:wrap;}
+.msel label{font-family:"DM Mono",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);}
+.msel select{font-family:"DM Mono",monospace;font-size:.73rem;padding:.32rem .62rem;border:2px solid var(--border);background:var(--paper);color:var(--ink);border-radius:2px;cursor:pointer;}
+.wblk{margin-bottom:1.2rem;border:2px solid var(--border);border-radius:4px;overflow:hidden;}
+.whd{padding:.65rem .95rem;display:flex;align-items:center;justify-content:space-between;gap:.8rem;cursor:pointer;user-select:none;}
+.wg1 .whd{background:var(--g1);}.wg2 .whd{background:var(--g2);}.wg3 .whd{background:var(--g3);}.wg4 .whd{background:#f5e8f8;}
+.whd h3{font-family:"DM Serif Display",serif;font-size:.88rem;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;}
+.wtg{font-family:"DM Mono",monospace;font-size:.55rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:.15rem .4rem;border-radius:2px;background:rgba(0,0,0,.08);}
+.chev{font-size:.78rem;color:var(--muted);transition:transform .3s;}
+.wblk.closed .chev{transform:rotate(-90deg);}.wblk.closed .wb-body{display:none;}
+.dgrid{display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--border);}
+@media(max-width:980px){.dgrid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:540px){.dgrid{grid-template-columns:repeat(2,1fr);}}
+.dcol{border-right:1px solid var(--border);}.dcol:last-child{border-right:none;}.dcol.sun-col{background:rgba(0,0,0,.018);}
+.dname{font-family:"DM Mono",monospace;font-size:.56rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:.36rem .58rem;background:rgba(0,0,0,.03);border-bottom:1px solid var(--border);color:var(--muted);display:flex;justify-content:space-between;align-items:center;}
+.dnum{font-family:"DM Serif Display",serif;font-size:.88rem;opacity:.2;}
+.dcol.today-col .dname{background:var(--red);color:#fff;}.dcol.today-col .dnum{opacity:1;color:#fff;}
+.dtasks{padding:.36rem .38rem .42rem;display:flex;flex-direction:column;gap:.22rem;}
+.ctask{padding:.3rem .42rem;border-radius:3px;font-size:.59rem;font-weight:600;line-height:1.3;cursor:pointer;transition:transform .12s;display:flex;align-items:flex-start;gap:.24rem;border-left:2px solid transparent;background:var(--white);box-shadow:0 1px 2px rgba(0,0,0,.04);}
+.ctask:hover{transform:translateX(2px);}.ctask.done{opacity:.3;text-decoration:line-through;}
+.cck{width:9px;height:9px;border:2px solid currentColor;border-radius:2px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:.4rem;color:#fff;transition:all .14s;}
+.ctask.done .cck{background:var(--green);border-color:var(--green);}.ctask.done .cck::after{content:"✓";}
+.ct-q{border-left-color:var(--red);color:var(--red);}.ct-l{border-left-color:var(--teal);color:var(--teal);}
+.ct-j{border-left-color:var(--blue);color:var(--blue);}.ct-r{border-left-color:var(--gold);color:var(--gold);}
+.ct-h{border-left-color:var(--purple);color:var(--purple);}.ct-sun{border-left-color:var(--muted);color:var(--muted);}
+.dmeta{padding:.16rem .42rem .38rem;font-family:"DM Mono",monospace;font-size:.52rem;color:var(--muted);border-top:1px dashed var(--border);margin:0 .08rem;line-height:1.4;}
+.leica-ref{color:var(--teal);font-weight:700;}
+.cal-leg{display:flex;gap:.55rem;flex-wrap:wrap;padding:.55rem .85rem;border-top:1px solid var(--border);background:rgba(0,0,0,.012);}
+.cl{display:flex;align-items:center;gap:.24rem;font-family:"DM Mono",monospace;font-size:.56rem;color:var(--muted);}
+.cd{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+/* reading */
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.2rem;}
+@media(max-width:620px){.rg{grid-template-columns:1fr;}}
+.rc{border:2px solid var(--border);border-radius:4px;overflow:hidden;}
+.rc-hd{padding:.7rem 1rem;background:var(--ink);color:var(--paper);}
+.rc-hd h3{font-family:"DM Serif Display",serif;font-size:.9rem;margin-bottom:.12rem;}
+.rc-hd p{font-family:"DM Mono",monospace;font-size:.56rem;color:#a09070;text-transform:uppercase;letter-spacing:.06em;}
+.rc-body{padding:.48rem;}
+.ri{display:flex;align-items:center;gap:.58rem;padding:.38rem .6rem;border-radius:3px;cursor:pointer;transition:all .14s;background:var(--white);border:1px solid var(--border);margin-bottom:.22rem;}
+.ri:last-child{margin-bottom:0;}.ri:hover{border-color:var(--blue);}.ri.done{opacity:.35;}
+.rn{font-family:"DM Mono",monospace;font-size:.58rem;font-weight:700;color:var(--muted);min-width:18px;}
+.rname{font-size:.71rem;font-weight:600;flex:1;}
+.rck{width:14px;height:14px;border:2px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:.54rem;color:#fff;transition:all .2s;flex-shrink:0;}
+.ri.done .rck{background:var(--green);border-color:var(--green);}.ri.done .rck::after{content:"✓";}
+/* groups */
+.gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;margin-bottom:1.2rem;}
+.gc{border:2px solid var(--border);border-radius:4px;overflow:hidden;}
+.gc-hd{padding:.6rem .92rem;font-family:"DM Serif Display",serif;font-size:.85rem;}
+.gh1{background:var(--g1);}.gh2{background:var(--g2);}.gh3{background:var(--g3);}
+.gc ul{list-style:none;padding:.25rem 0;}
+.gc li{padding:.26rem .88rem;font-size:.69rem;border-bottom:1px dashed var(--border);display:flex;align-items:center;gap:.32rem;}
+.gc li:last-child{border-bottom:none;}
+.gc li::before{content:"—";color:var(--muted);font-size:.56rem;font-family:"DM Mono",monospace;}
+/* notes */
+.note{background:var(--cream);border:2px solid var(--border);border-left:5px solid var(--gold);padding:.78rem 1rem;border-radius:4px;margin-bottom:.9rem;}
+.note h4{font-family:"DM Mono",monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.09em;color:var(--gold);margin-bottom:.38rem;}
+.note p,.note li{font-size:.73rem;line-height:1.6;color:var(--muted);}
+.note ul{padding-left:.9rem;}
+.sec-ttl{font-family:"DM Serif Display",serif;font-size:1.2rem;margin-bottom:.9rem;padding-bottom:.55rem;border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;}
+.sec-ttl span{font-family:"DM Mono",monospace;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:400;}
+.sun-rest{display:flex;align-items:center;justify-content:center;height:60px;font-family:"DM Mono",monospace;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;opacity:.5;}
+@media print{header{position:static;}nav{display:none;}.panel{display:block!important;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hl">
+    <h1>Cronograma <em>TJ-BA</em> · Magistratura Estadual</h1>
+    <div class="hl-sub">76 dias · Plano LIGHT condensado (3 em 1) · 19/03–15/06/2026 · Dom = descanso</div>
+  </div>
+  <div class="hr">
+    <div><div id="hd-date"></div><div style="font-family:DM Mono,monospace;font-size:.54rem;color:#a09070;margin-top:1px;text-align:right">30–40q/dia</div></div>
+    <div class="badge" id="badge-done">0/0</div>
+  </div>
+</header>
+<nav>
+  <button class="tab active" onclick="showTab('leica',this)">📖 Lei Seca — 76 dias</button>
+  <button class="tab" onclick="showTab('cal',this)">📅 Cronograma Mensal</button>
+  <button class="tab" onclick="showTab('leitura',this)">📚 Humanística / Difusos</button>
+  <button class="tab" onclick="showTab('grupos',this)">⚖️ Grupos TJ-BA</button>
+  <button class="tab" onclick="showTab('notas',this)">📝 Metodologia</button>
+</nav>
+<div class="content">
+
+<!-- LEI SECA -->
+<div class="panel active" id="panel-leica">
+  <div id="today-banner"></div>
+  <div class="blocks-legend">
+    <div class="blk"><div class="blk-n n-r">1</div><div class="blk-info"><div class="bl-time">1h40</div><div class="bl-desc">30–40 questões da matéria do dia</div></div></div>
+    <div class="blk"><div class="blk-n n-g">2</div><div class="blk-info"><div class="bl-time">1h30</div><div class="bl-desc">Lei seca — plano condensado do dia</div></div></div>
+    <div class="blk"><div class="blk-n n-b">3</div><div class="blk-info"><div class="bl-time">40min</div><div class="bl-desc">Jurisprudência (STF/STJ informativos)</div></div></div>
+    <div class="blk"><div class="blk-n n-p">4</div><div class="blk-info"><div class="bl-time">10min</div><div class="bl-desc">Revisão dos erros e anotações</div></div></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="sv g" id="s-done">0</div><div class="sl">Itens lidos</div></div>
+    <div class="stat"><div class="sv" id="s-total">—</div><div class="sl">Total itens</div></div>
+    <div class="stat"><div class="sv" id="s-dd">0</div><div class="sl">Dias completos</div></div>
+    <div class="stat"><div class="sv" id="s-dl">76</div><div class="sl">Dias restantes</div></div>
+    <div class="stat"><div class="sv" style="color:var(--teal)">15/06</div><div class="sl">Conclusão</div></div>
+  </div>
+  <div class="gprog">
+    <div class="gp-pct" id="gpct">0%</div>
+    <div class="gp-bar"><div class="gp-fill" id="gfill" style="width:0%"></div></div>
+    <div class="gp-lbl" id="glbl">carregando…</div>
+  </div>
+  <div class="filters">
+    <label>Filtrar:</label>
+    <button class="mfb active" onclick="fM('all',this)">Todos</button>
+    <button class="mfb" onclick="fM('2026-03',this)">Mar</button>
+    <button class="mfb" onclick="fM('2026-04',this)">Abr</button>
+    <button class="mfb" onclick="fM('2026-05',this)">Mai</button>
+    <button class="mfb" onclick="fM('2026-06',this)">Jun</button>
+    <input type="text" id="srch" placeholder="🔍 Buscar lei, art, dia…" oninput="renderLeica()">
+    <button class="btn d" onclick="resetLeica()">↺ Reiniciar leitura</button>
+  </div>
+  <div class="cards-grid" id="leica-root"></div>
+</div>
+
+<!-- CRONOGRAMA MENSAL -->
+<div class="panel" id="panel-cal">
+  <div class="msel">
+    <label>Mês/Ano:</label>
+    <select id="my" onchange="renderCal()"></select>
+    <button class="btn" onclick="window.print()">🖨 Imprimir</button>
+    <button class="btn d" onclick="resetCal()">↺ Reiniciar progresso</button>
+  </div>
+  <div id="cal-root"></div>
+  <div class="cal-leg">
+    <div class="cl"><div class="cd" style="background:#fde0d8;border:2px solid var(--red)"></div>Questões 30–40q</div>
+    <div class="cl"><div class="cd" style="background:#ceebd8;border:2px solid var(--teal)"></div>Lei Seca</div>
+    <div class="cl"><div class="cd" style="background:#cce0f5;border:2px solid var(--blue)"></div>Jurisprudência</div>
+    <div class="cl"><div class="cd" style="background:#fdf0cc;border:2px solid var(--gold)"></div>Revisão erros</div>
+    <div class="cl"><div class="cd" style="background:#eeddf5;border:2px solid var(--purple)"></div>Humanística</div>
+    <div class="cl"><div class="cd" style="background:rgba(184,80,0,.12);border:2px solid var(--orange)"></div>Tem pendência 📌</div>
+  </div>
+</div>
+
+<!-- HUMANÍSTICA -->
+<div class="panel" id="panel-leitura">
+  <h2 class="sec-ttl">Humanística e Difusos — Grupo III TJ-BA<span>Clique para marcar concluído</span></h2>
+  <div class="rg">
+    <div class="rc"><div class="rc-hd"><h3>Matérias Humanísticas</h3><p>Ordem de estudos — Grupo III</p></div><div class="rc-body" id="humanist-list"></div></div>
+    <div class="rc"><div class="rc-hd"><h3>Direitos Difusos</h3><p>Ordem de estudos</p></div><div class="rc-body" id="difusos-list"></div></div>
+  </div>
+  <h2 class="sec-ttl" style="margin-top:.7rem">Matérias com Doutrina Necessária<span>Resumo destacado + CEI</span></h2>
+  <div style="display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:1.3rem">
+    <span style="background:#fde0d8;border:2px solid var(--red);padding:.3rem .72rem;border-radius:3px;font-size:.7rem;font-weight:700">Constitucional</span>
+    <span style="background:#fde0d8;border:2px solid var(--red);padding:.3rem .72rem;border-radius:3px;font-size:.7rem;font-weight:700">Direitos Humanos</span>
+    <span style="background:#fde0d8;border:2px solid var(--red);padding:.3rem .72rem;border-radius:3px;font-size:.7rem;font-weight:700">Humanística</span>
+    <span style="background:#fde0d8;border:2px solid var(--red);padding:.3rem .72rem;border-radius:3px;font-size:.7rem;font-weight:700">ECA</span>
+    <span style="background:#fde0d8;border:2px solid var(--red);padding:.3rem .72rem;border-radius:3px;font-size:.7rem;font-weight:700">Criminologia</span>
+    <span style="background:#fde0d8;border:2px solid var(--red);padding:.3rem .72rem;border-radius:3px;font-size:.7rem;font-weight:700">Direito Penal</span>
+  </div>
+</div>
+
+<!-- GRUPOS -->
+<div class="panel" id="panel-grupos">
+  <h2 class="sec-ttl">Grupos de Matérias — TJ-BA (Edital)</h2>
+  <div class="gg">
+    <div class="gc"><div class="gc-hd gh1">📗 Grupo I</div><ul>
+      <li>Direito Civil (CC)</li><li>Direito Processual Civil (CPC)</li>
+      <li>Direito do Consumidor (CDC)</li><li>Direito da Criança e do Adolescente (ECA)</li>
+    </ul></div>
+    <div class="gc"><div class="gc-hd gh2">🔴 Grupo II</div><ul>
+      <li>Direito Penal — Parte Geral e Especial (CP)</li>
+      <li>Direito Processual Penal (CPP)</li><li>Direito Constitucional (CF)</li>
+      <li>Direito Eleitoral</li><li>Legislação Penal Especial</li>
+    </ul></div>
+    <div class="gc"><div class="gc-hd gh3">📙 Grupo III</div><ul>
+      <li>Direito Empresarial</li><li>Direito Tributário e Financeiro</li>
+      <li>Direito Ambiental</li><li>Direito Administrativo</li>
+      <li>Humanística (Ética, Sociologia, Filosofia, Psicologia, Dir. Digital)</li>
+      <li>Direitos Humanos</li>
+    </ul></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="sv">4h</div><div class="sl">Por dia (meta)</div></div>
+    <div class="stat"><div class="sv">76</div><div class="sl">Dias plano</div></div>
+    <div class="stat"><div class="sv">3em1</div><div class="sl">Condensação</div></div>
+    <div class="stat"><div class="sv" style="color:var(--teal)">15/06</div><div class="sl">Conclusão</div></div>
+  </div>
+</div>
+
+<!-- METODOLOGIA -->
+<div class="panel" id="panel-notas">
+  <h2 class="sec-ttl">Metodologia</h2>
+  <div class="note" style="border-left-color:var(--red)"><h4>📋 Estrutura diária (4h)</h4>
+    <ul style="margin-top:.28rem">
+      <li><strong>Bloco 1 — 1h40:</strong> 30–40 questões da matéria do dia (banca CESPE + nível superior)</li>
+      <li><strong>Bloco 2 — 1h30:</strong> Lei seca dos dias do plano condensado</li>
+      <li><strong>Bloco 3 — 40min:</strong> Jurisprudência — informativos STF e STJ</li>
+      <li><strong>Bloco 4 — 10min:</strong> Revisão dos erros e anotações</li>
+    </ul></div>
+  <div class="note" style="border-left-color:var(--teal)"><h4>📘 Plano Light condensado — 76 dias</h4>
+    <ul style="margin-top:.28rem">
+      <li>Dia N = orig[N] + orig[N+76] + orig[N+152] do Plano Light (212 dias)</li>
+      <li>Dias 1–60: cobrem 3 dias originais; Dias 61–76: cobrem 2 dias originais</li>
+      <li>19/03 → 15/06/2026 · Seg–Sáb · Dom = descanso</li></ul></div>
+  <div class="note" style="border-left-color:var(--orange)"><h4>📌 Campo de Pendências</h4>
+    <ul style="margin-top:.28rem">
+      <li>Cada dia tem um campo para anotar o que ficou pendente</li>
+      <li>As anotações são <strong>salvas automaticamente</strong> no seu navegador</li>
+      <li>Cards com pendências ficam com <strong>borda laranja</strong> e bolinha laranja para identificação rápida</li></ul></div>
+  <div class="note" style="border-left-color:var(--gold)"><h4>📚 Materiais</h4>
+    <ul style="margin-top:.28rem">
+      <li><strong>Lei seca:</strong> Legislação Destacada ou Legislação 360</li>
+      <li><strong>Doutrina:</strong> Const, DH, Humanística, ECA, Criminologia, Penal → CEI</li>
+      <li><strong>Jurisprudência:</strong> Dizer o Direito / Informativos STF e STJ</li></ul></div>
+</div>
+
+</div>
+<script>
+const SC=[{"d":1,"date":"2026-03-19","dd":"19/03","wd":"Qui","items":["CF art. 1–4","Lei 4717/65 – Ação Popular","CC art. 1548–1582","CPC art. 994–1014","DL 911/69 – Alienação Fiduciária Bens Móveis","Lei 10257/01 – Estatuto da Cidade art. 1–14"]},{"d":2,"date":"2026-03-20","dd":"20/03","wd":"Sex","items":["CF art. 5","Lei 1579/52 – CPI","CC art. 1583–1619","CPC art. 1015–1021","Lei 10257/01 – Estatuto da Cidade art. 21–57-A","Lei 9514/97 – Alienação Fiduciária Imóveis"]},{"d":3,"date":"2026-03-21","dd":"21/03","wd":"Sáb","items":["CF art. 6–17","Lei 11417/06 – Súmula Vinculante","Lei 9882/99 – ADPF","CC art. 1630–1671","CPC art. 1022–1028","Código Eleitoral art. 1–15","Lei 6091/74 – Transporte nas Eleições"]},{"d":4,"date":"2026-03-23","dd":"23/03","wd":"Seg","items":["CF art. 18–24","Lei 12562/11 – ADI Interventiva","Lei 13300/16 – Mandado de Injunção","CC art. 1672–1710","CPC art. 1029–1035","Código Eleitoral art. 16–31","Lei 9096/95 – Partidos Políticos art. 1–29"]},{"d":5,"date":"2026-03-24","dd":"24/03","wd":"Ter","items":["CF art. 25–36","Lei 9868/99 – ADI/ADC/ADO","CC art. 1711–1734","CPC art. 1036–1044","Código Eleitoral art. 32–66","Lei 9096/95 – Partidos Políticos art. 30–61"]},{"d":6,"date":"2026-03-25","dd":"25/03","wd":"Qua","items":["CF art. 37–38","CC art. 1735–1797","CPC art. 1045–1072","Código Eleitoral art. 67–102","Lei 9504/97 – Lei das Eleições art. 1–16-B"]},{"d":7,"date":"2026-03-26","dd":"26/03","wd":"Qui","items":["CF art. 39–43","Lei 11107/05 – Consórcios Públicos","CC art. 1798–1856","Lei 13146/15 – EPD art. 1–30","Código Eleitoral art. 103–134","Lei 9504/97 – Lei das Eleições art. 16-C–32"]},{"d":8,"date":"2026-03-27","dd":"27/03","wd":"Sex","items":["CF art. 44–58","CC art. 1857–1922","Lei 13146/15 – EPD art. 31–125","Código Eleitoral art. 135–168","Lei 9504/97 – Lei das Eleições art. 33–41-A"]},{"d":9,"date":"2026-03-28","dd":"28/03","wd":"Sáb","items":["CF art. 59–69","Lei 12016/09 – Mandado de Segurança","CC art. 1923–2046","Lei 10216/01 – Transtornos Mentais","Código Eleitoral art. 169–204","Lei 9504/97 – Lei das Eleições art. 43–57-J"]},{"d":10,"date":"2026-03-30","dd":"30/03","wd":"Seg","items":["CF art. 70–91","Lei 9790/99 – OSCIP","CP art. 1–12","CPP art. 1–3-F","Código Eleitoral art. 205–239","Lei 9504/97 – Lei das Eleições art. 58–78"]},{"d":11,"date":"2026-03-31","dd":"31/03","wd":"Ter","items":["CF art. 92–100","Lei 9637/98 – Organização Social","CP art. 13–19","CPP art. 4–23","Lei 9296/96 – Interceptação Telefônica","Código Eleitoral art. 240–279","Lei 9504/97 – Lei das Eleições art. 79–105-A"]},{"d":12,"date":"2026-04-01","dd":"01/04","wd":"Qua","items":["CF art. 101–105","Lei 9784/99 – Proc. Adm. art. 1–47","CP art. 20–31","CPP art. 24–40","Código Eleitoral art. 280–354-A","Lei 5474/68 – Duplicata"]},{"d":13,"date":"2026-04-02","dd":"02/04","wd":"Qui","items":["CF art. 106–126","Lei 9784/99 – Proc. Adm. art. 48–69-A","CP art. 32–48","CPP art. 41–62","Lei 9455/97 – Tortura","Código Eleitoral art. 355–381","Lei 5478/68 – Alimentos"]},{"d":14,"date":"2026-04-03","dd":"03/04","wd":"Sex","items":["CF art. 127–144","Lei 8987/95 – Serviços Públicos art. 1–22","CP art. 49–59","CPP art. 63–82","Lei 7960/89 – Prisão Temporária","LC 64/90 – Inelegibilidades","Lei 11804/08 – Alimentos Gravídicos"]},{"d":15,"date":"2026-04-04","dd":"04/04","wd":"Sáb","items":["CF art. 145–152","Lei 8987/95 – Serviços Públicos art. 23–45","CP art. 60–70","CPP art. 83–94","Lei 7716/89 – Preconceito","DUDH","Lei 8560/92 – Investigação de Paternidade"]},{"d":16,"date":"2026-04-06","dd":"06/04","wd":"Seg","items":["CF art. 153–154","Lei 11079/04 – PPP","CP art. 71–90","CPP art. 95–154","Lei 8245/91 – Lei de Locações"]},{"d":17,"date":"2026-04-07","dd":"07/04","wd":"Ter","items":["CF art. 155–156","Lei 4132/65 – Desapropriação por Interesse Social","CP art. 91–120","CPP art. 155–184","DL 57663/66 – Letra de Câmbio e NP art. 1–54","Lei 13775/18 – Duplicata Escritural"]},{"d":18,"date":"2026-04-08","dd":"08/04","wd":"Qua","items":["CF art. 157–162","DL 3365/41 – Desapropriação por Utilidade Pública","CP art. 121–129","CPP art. 185–230","DL 57663/66 – Letra de Câmbio e NP art. 55–78"]},{"d":19,"date":"2026-04-09","dd":"09/04","wd":"Qui","items":["CF art. 163–169","DL 25/37 – Tombamento","CP art. 130–149-A","CPP art. 231–281","Lei 11101/05 – Falência art. 1–20","Lei 9279/96 – Prop. Industrial art. 1–49"]},{"d":20,"date":"2026-04-10","dd":"10/04","wd":"Sex","items":["CF art. 170–192","Lei 12846/13 – Anticorrupção","CP art. 150–160","CPP art. 282–300","Lei 11101/05 – Falência art. 20-A–46","Lei 9279/96 – Prop. Industrial art. 50–93"]},{"d":21,"date":"2026-04-11","dd":"11/04","wd":"Sáb","items":["CADH art. 1–26","CF art. 193–204","CP art. 161–179","CPP art. 301–310","Lei 11101/05 – Falência art. 47–54","Lei 9279/96 – Prop. Industrial art. 94–125"]},{"d":22,"date":"2026-04-13","dd":"13/04","wd":"Seg","items":["CADH art. 27–73","CF art. 205–219-B","CP art. 180–216-B","CPP art. 311–318-B","Lei 11101/05 – Falência art. 55–72","Lei 9279/96 – Prop. Industrial art. 126–157"]},{"d":23,"date":"2026-04-14","dd":"14/04","wd":"Ter","items":["CF art. 220–230","Código de Ética da Magistratura Nacional","CP art. 217-A–234","CPP art. 319–369","Lei 11101/05 – Falência art. 73–101","Lei 9279/96 – Prop. Industrial art. 158–210"]},{"d":24,"date":"2026-04-15","dd":"15/04","wd":"Qua","items":["CF art. 231–250","LC 35/79 – LOMAN art. 1–68","CP art. 234-A–259","CPP art. 370–405","Lei 11101/05 – Falência art. 102–148","Lei 9279/96 – Prop. Industrial art. 211–244"]},{"d":25,"date":"2026-04-16","dd":"16/04","wd":"Qui","items":["Lei 8038/90 – Processos Originários nos Tribunais","LC 35/79 – LOMAN art. 69–147","CP art. 260–295","CPP art. 406–431","Lei 11101/05 – Falência art. 149–167-G","Lei 6015/73 – Registros Públicos art. 1–28"]},{"d":26,"date":"2026-04-17","dd":"17/04","wd":"Sex","items":["Lei 7357/85 – Cheque","Lei 8429/92 – Improbidade art. 1–11","CP art. 296–316","CPP art. 432–475","Lei 11101/05 – Falência art. 167-H–188","Lei 6015/73 – Registros Públicos art. 29–56"]},{"d":27,"date":"2026-04-18","dd":"18/04","wd":"Sáb","items":["Lei 8429/92 – Improbidade art. 12–24","CP art. 317–337-D","CPP art. 476–518","Lei 11101/05 – Falência art. 189–199","Lei 6015/73 – Registros Públicos art. 57–76"]},{"d":28,"date":"2026-04-20","dd":"20/04","wd":"Seg","items":["Lei 14133/21 – Licitações art. 1–17","CP art. 337-E–337-P","CPP art. 519–573","Lei 6015/73 – Registros Públicos art. 77–121","Lei 6404/76 – S.A. art. 1–38"]},{"d":29,"date":"2026-04-21","dd":"21/04","wd":"Ter","items":["Lei 14133/21 – Licitações art. 18–58","CP art. 338–359-H","CPP art. 574–592","Lei 6015/73 – Registros Públicos art. 122–166","Lei 6404/76 – S.A. art. 39–71"]},{"d":30,"date":"2026-04-22","dd":"22/04","wd":"Qua","items":["Lei 14133/21 – Licitações art. 59–86","CP art. 359-I–359-T","CPP art. 593–631","Lei 6015/73 – Registros Públicos art. 167–181","Lei 6404/76 – S.A. art. 72–108"]},{"d":31,"date":"2026-04-23","dd":"23/04","wd":"Qui","items":["Lei 14133/21 – Licitações art. 87–139","CPP art. 637–667","Lei 9503/97 – Crimes de Trânsito","Lei 6015/73 – Registros Públicos art. 182–220","Lei 6404/76 – S.A. art. 109–131"]},{"d":32,"date":"2026-04-24","dd":"24/04","wd":"Sex","items":["Lei 14133/21 – Licitações art. 140–194","CPP art. 743–750 / 780–809","Lei 8137/90 – Crimes contra Ordem Tributária","Lei 6015/73 – Registros Públicos art. 221–299","Lei 6404/76 – S.A. art. 132–152"]},{"d":33,"date":"2026-04-25","dd":"25/04","wd":"Sáb","items":["Lei 7347/85 – Ação Civil Pública","Lei 12153/09 – JEF Fazenda Pública","Lei 1521/51 – Crimes Economia Popular","Lei 9807/99 – Proteção à Testemunha","Lei 6404/76 – S.A. art. 153–207"]},{"d":34,"date":"2026-04-27","dd":"27/04","wd":"Seg","items":["Lei 13303/16 – Empresa Pública art. 1–27","Lei 13460/17 – Direitos dos Usuários","Lei 9099/95 – Juizados Especiais Cíveis","Lei 6404/76 – S.A. art. 208–279"]},{"d":35,"date":"2026-04-28","dd":"28/04","wd":"Ter","items":["Lei 12694/12 – Julgamento Colegiado 1º Grau","Lei 13303/16 – Empresa Pública art. 28–50","Lei 9099/95 – Juizados Especiais Criminais","Lei 6404/76 – S.A. art. 280–299-B"]},{"d":36,"date":"2026-04-29","dd":"29/04","wd":"Qua","items":["Lei 10778/03 – Notificação Violência contra Mulher","Lei 13303/16 – Empresa Pública art. 51–95","Lei 14022/20 – Violência Doméstica","Lei 14188/21 – Sinal Vermelho","Lei 8176/91 – Crimes contra Ordem Econômica","Lei 10826/03 – Estatuto do Desarmamento","ADCT art. 1–72"]},{"d":37,"date":"2026-04-30","dd":"30/04","wd":"Qui","items":["DL 4657/42 – LINDB","Lei 8112/90 – Servidores art. 1–39","Lei 12850/13 – Organização Criminosa","ADCT art. 73–120"]},{"d":38,"date":"2026-05-01","dd":"01/05","wd":"Sex","items":["Lei 8112/90 – Servidores art. 40–126-A","Lei 11343/06 – Lei de Drogas art. 1–47","Lei 14344/22 – Violência Doméstica contra Criança e Adolescente"]},{"d":39,"date":"2026-05-02","dd":"02/05","wd":"Sáb","items":["Lei 8112/90 – Servidores art. 127–225","Lei 11343/06 – Lei de Drogas art. 48–73","Lei 13869/19 – Abuso de Autoridade"]},{"d":40,"date":"2026-05-04","dd":"04/05","wd":"Seg","items":["Lei 8112/90 – Servidores art. 226–250","Lei 9469/97 – Intervenção Anômala","CTN art. 1–15","Lei 9605/98 – Crimes Ambientais","LC 123/06 – ME e EPP art. 1–16"]},{"d":41,"date":"2026-05-05","dd":"05/05","wd":"Ter","items":["Lei 13848/19 – Agências Reguladoras","CTN art. 16–51","Lei 7210/84 – LEP art. 1–35","LC 123/06 – ME e EPP art. 17–27"]},{"d":42,"date":"2026-05-06","dd":"06/05","wd":"Qua","items":["Lei 13019/14 – Parcerias com OSC","CTN art. 63–106","Lei 7210/84 – LEP art. 36–52","LC 123/06 – ME e EPP art. 28–89"]},{"d":43,"date":"2026-05-07","dd":"07/05","wd":"Qui","items":["Lei 9307/96 – Arbitragem","Lei 9492/97 – Protesto de Títulos","CTN art. 107–133","Lei 7210/84 – LEP art. 53–81","Lei 12965/14 – Marco Civil da Internet"]},{"d":44,"date":"2026-05-08","dd":"08/05","wd":"Sex","items":["Lei 9507/97 – Habeas Data","Lei 8176/91 – Crimes contra Ordem Econômica","CTN art. 134–156","Lei 7210/84 – LEP art. 81-A–119","Lei 8213/91 – Previdência Social art. 1–15"]},{"d":45,"date":"2026-05-09","dd":"09/05","wd":"Sáb","items":["CC art. 1–21","CPC art. 1–15","CTN art. 157–193","Lei 7210/84 – LEP art. 120–146","Lei 8213/91 – Previdência Social art. 16–27-A"]},{"d":46,"date":"2026-05-11","dd":"11/05","wd":"Seg","items":["CC art. 22–69","CPC art. 16–53","CTN art. 194–216","Lei 7210/84 – LEP art. 146-B–204","Lei 8213/91 – Previdência Social art. 28–47"]},{"d":47,"date":"2026-05-12","dd":"12/05","wd":"Ter","items":["CC art. 70–137","CPC art. 54–69","Lei 11340/06 – Maria da Penha art. 1–24","Lei 9613/98 – Lavagem de Dinheiro art. 1–6","Lei 8212/91 – Seguridade Social art. 1–20","Lei 8213/91 – Previdência art. 48–58"]},{"d":48,"date":"2026-05-13","dd":"13/05","wd":"Qua","items":["CC art. 138–204","CPC art. 70–81","Lei 11340/06 – Maria da Penha art. 25–41","Lei 9613/98 – Lavagem de Dinheiro art. 7–17-E","Lei 8212/91 – Seguridade Social art. 21–28","Lei 8213/91 – Previdência art. 59–73"]},{"d":49,"date":"2026-05-14","dd":"14/05","wd":"Qui","items":["CC art. 205–232","CPC art. 82–97","DL 3688/41 – Contravenções Penais art. 1–17","Lei 10048/00 – Prioridade de Atendimento","Lei 10098/00 – Acessibilidade","Lei 13140/15 – Mediação","Lei 8212/91 – Seguridade Social art. 30–48","Lei 8213/91 – Previdência art. 74–86"]},{"d":50,"date":"2026-05-15","dd":"15/05","wd":"Sex","items":["CC art. 233–285","CPC art. 98–118","DL 3688/41 – Contravenções Penais art. 18–71","Lei 8212/91 – Seguridade Social art. 49–102","Lei 8213/91 – Previdência art. 88–124-C"]},{"d":51,"date":"2026-05-16","dd":"16/05","wd":"Sáb","items":["CC art. 286–367","CPC art. 119–138","Lei 6830/80 – Cobrança Dívida Ativa art. 1–34","LC 109/01 – Previdência Complementar art. 1–35","Lei 8213/91 – Previdência art. 125–154"]},{"d":52,"date":"2026-05-18","dd":"18/05","wd":"Seg","items":["CC art. 368–420","CPC art. 139–161","Lei 6830/80 – Cobrança Dívida Ativa art. 35–42","LC 108/01 – Entidades Fechadas Prev. Complementar","LC 109/01 – Prev. Complementar art. 36–77","Lei 9717/98 – Regimes Próprios de Previdência"]},{"d":53,"date":"2026-05-19","dd":"19/05","wd":"Ter","items":["CC art. 421–461","CPC art. 162–192","Lei 11419/06 – Processo Eletrônico","Lei 12527/11 – Lei de Acesso à Informação","D 20910/32 – Prescrição Quinquenal","DL 4597/42 – Prescrição contra Fazenda","Lei 1060/50 – Assistência Judiciária","Lei 8009/97 – Bem de Família","Lei 8437/92 – Medidas Cautelares","Lei 9494/97 – Tutela Antecipada contra Fazenda"]},{"d":54,"date":"2026-05-20","dd":"20/05","wd":"Qua","items":["CC art. 462–512","CPC art. 193–232","Lei 13709/18 – LGPD art. 1–22","Lei 7853/89 – Apoio às Pessoas com Deficiência","Lei 10098/00 – Acessibilidade","Lei 12288/10 – Estatuto Igualdade Racial","Lei 7853/89 – Apoio às Pessoas com Deficiência"]},{"d":55,"date":"2026-05-21","dd":"21/05","wd":"Qui","items":["CC art. 513–564","CPC art. 233–268","Lei 13709/18 – LGPD art. 23–65","Lei 8742/93 – Assistência Social","Res. 348/20 CNJ – Pop. LGBTI custodiada"]},{"d":56,"date":"2026-05-22","dd":"22/05","wd":"Sex","items":["CC art. 565–626","CPC art. 269–304","Lei 10741/03 – Estatuto do Idoso","DL 167/67 – Títulos de Crédito Rural"]},{"d":57,"date":"2026-05-23","dd":"23/05","wd":"Sáb","items":["CC art. 627–691","CPC art. 305–333","CDC art. 1–10","ECA art. 1–24","Lei 10931/04 – Incorporações Imobiliárias"]},{"d":58,"date":"2026-05-25","dd":"25/05","wd":"Seg","items":["CC art. 692–756","CPC art. 334–357","CDC art. 12–27","ECA art. 25–49","Lei 6024/74 – Intervenção e Liquidação de Inst. Financeiras"]},{"d":59,"date":"2026-05-26","dd":"26/05","wd":"Ter","items":["CC art. 757–788","CPC art. 358–395","Lei 8072/90 – Crimes Hediondos","CDC art. 28–50","ECA art. 50–52-D","Lei 12305/10 – Resíduos Sólidos"]},{"d":60,"date":"2026-05-27","dd":"27/05","wd":"Qua","items":["CC art. 789–802","CPC art. 396–449","Lei 7716/89 – Preconceito","CDC art. 51–80","ECA art. 53–94-A","Lei 4320/64 – Normas Gerais de Direito Financeiro"]},{"d":61,"date":"2026-05-28","dd":"28/05","wd":"Qui","items":["CC art. 803–875","CPC art. 450–488","CDC art. 81–104","ECA art. 95–117"]},{"d":62,"date":"2026-05-29","dd":"29/05","wd":"Sex","items":["CC art. 876–926","CPC art. 489–519","CDC art. 104-A–107","ECA art. 118–137"]},{"d":63,"date":"2026-05-30","dd":"30/05","wd":"Sáb","items":["CC art. 927–954","CPC art. 520–535","ECA art. 138–170","Lei 13431/17 – Sistema de Garantias"]},{"d":64,"date":"2026-06-01","dd":"01/06","wd":"Seg","items":["CC art. 955–996","CPC art. 536–587","ECA art. 171–199-E","Provimento 118 CNJ – Audiências Concentradas"]},{"d":65,"date":"2026-06-02","dd":"02/06","wd":"Ter","items":["CC art. 997–1038","CPC art. 588–638","ECA art. 200–244-B","Lei 9985/00 – SNUC art. 1–21"]},{"d":66,"date":"2026-06-03","dd":"03/06","wd":"Qua","items":["CC art. 1039–1087","CPC art. 639–686","ECA art. 245–265-A","Lei 9985/00 – SNUC art. 22–58"]},{"d":67,"date":"2026-06-04","dd":"04/06","wd":"Qui","items":["CC art. 1088–1149","CPC art. 687–725","Lei 12594/12 – SINASE"]},{"d":68,"date":"2026-06-05","dd":"05/06","wd":"Sex","items":["CC art. 1150–1195","CPC art. 726–770","Lei 12651/12 – Código Florestal art. 1–6","Lei 6938/81 – PNMA"]},{"d":69,"date":"2026-06-06","dd":"06/06","wd":"Sáb","items":["CC art. 1196–1227","CPC art. 771–805","LC 140/11 – Fiscalização Ambiental","Lei 12651/12 – Código Florestal art. 7–34"]},{"d":70,"date":"2026-06-08","dd":"08/06","wd":"Seg","items":["CC art. 1228–1259","CPC art. 806–844","Lei 12651/12 – Código Florestal art. 35–60","Res. 237/97 CONAMA","Res. 378/06 CONAMA"]},{"d":71,"date":"2026-06-09","dd":"09/06","wd":"Ter","items":["CC art. 1260–1322","CPC art. 845–878","Lei 11445/07 – Saneamento Básico art. 1–13","Lei 12651/12 – Código Florestal art. 61–75"]},{"d":72,"date":"2026-06-10","dd":"10/06","wd":"Qua","items":["CC art. 1323–1358","CPC art. 879–913","Lei 11445/07 – Saneamento Básico art. 17–46","Lei 9433/97 – Recursos Hídricos"]},{"d":73,"date":"2026-06-11","dd":"11/06","wd":"Qui","items":["CC art. 1358-A–1368-F","CPC art. 914–928","Lei 11445/07 – Saneamento Básico art. 47–54-B","Lei 8080/90 – Saúde art. 1–19-J"]},{"d":74,"date":"2026-06-12","dd":"12/06","wd":"Sex","items":["CC art. 1369–1430","CPC art. 929–947","Lei 8080/90 – Saúde art. 19-M–53-A","Lei 9394/96 – LDB art. 1–28"]},{"d":75,"date":"2026-06-13","dd":"13/06","wd":"Sáb","items":["CC art. 1431–1501","CPC art. 948–975","Lei 6766/79 – Parcelamento do Solo art. 1–24","Lei 9394/96 – LDB art. 29–57"]},{"d":76,"date":"2026-06-15","dd":"15/06","wd":"Seg","items":["CC art. 1502–1547","CPC art. 976–993","Lei 6766/79 – Parcelamento do Solo art. 25–53-A","Lei 9394/96 – LDB art. 58–90"]}];
+const DATE2DAY={};SC.forEach(d=>DATE2DAY[d.date]=d.d);
+const G_DAYS=[
+  {n:"Seg",tasks:[{t:"30–40q — Civil / Proc. Civil",c:"ct-q"},{t:"Lei Seca: ver dia 📖",c:"ct-l"},{t:"Juris: STJ Civil",c:"ct-j"},{t:"Revisão erros",c:"ct-r"}]},
+  {n:"Ter",tasks:[{t:"30–40q — Penal / Proc. Penal",c:"ct-q"},{t:"Lei Seca: ver dia 📖",c:"ct-l"},{t:"Juris: STF/STJ Penal",c:"ct-j"},{t:"Revisão erros",c:"ct-r"}]},
+  {n:"Qua",tasks:[{t:"30–40q — Tributário / Adm",c:"ct-q"},{t:"Lei Seca: ver dia 📖",c:"ct-l"},{t:"Juris: STF Adm",c:"ct-j"},{t:"Revisão erros",c:"ct-r"}]},
+  {n:"Qui",tasks:[{t:"30–40q — CDC / ECA",c:"ct-q"},{t:"Lei Seca: ver dia 📖",c:"ct-l"},{t:"Juris: STJ ECA",c:"ct-j"},{t:"Revisão erros",c:"ct-r"}]},
+  {n:"Sex",tasks:[{t:"30–40q — Constitucional / Eleitoral",c:"ct-q"},{t:"Lei Seca: ver dia 📖",c:"ct-l"},{t:"Juris: STF Const",c:"ct-j"},{t:"Revisão erros",c:"ct-r"}]},
+  {n:"Sáb",tasks:[{t:"30–40q — Empresarial / Ambiental",c:"ct-q"},{t:"Lei Seca: ver dia 📖",c:"ct-l"},{t:"Humanística — Grupo III",c:"ct-h"},{t:"Revisão erros",c:"ct-r"}]},
+  {n:"Dom",tasks:[{t:"☀️ Descanso",c:"ct-sun"}]},
+];
+const WEEK_THEMES=[
+  {label:"1ª Semana",focus:"G1 Civil/CPC/CDC/ECA",cls:"wg1"},
+  {label:"2ª Semana",focus:"G2 Penal/Const/Eleitoral",cls:"wg2"},
+  {label:"3ª Semana",focus:"G3 Empresarial/Tributário/Ambiental",cls:"wg3"},
+  {label:"4ª Semana",focus:"Revisão Geral + Pendências",cls:"wg4"},
+];
+const HUMANIST=["Ética e Estatuto Jurídico da Magistratura Nacional","Sociologia do Direito","Direito da Antidiscriminação","Psicologia Judiciária","Filosofia do Direito","Teoria Geral do Direito e da Política","Direito Digital","Pragmatismo e Análise Econômica do Direito"];
+const DIFUSOS=["Processo Coletivo","Tutela Coletiva de Grupos Vulneráveis","Direito à Moradia e à Cidade"];
+
+const SK="tjba-v5";
+let S={};try{S=JSON.parse(localStorage.getItem(SK)||"{}");}catch(e){}
+function save(){try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}updateBadge();}
+
+function showTab(id,el){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("panel-"+id).classList.add("active");el.classList.add("active");
+}
+function updateBadge(){
+  let d=0,t=0;
+  SC.forEach((day,di)=>{
+    ["q","j","r"].forEach(k=>{t++;if(S["b-"+di+"-"+k])d++;});
+    day.items.forEach((_,ii)=>{t++;if(S["l-"+di+"-"+ii])d++;});
+  });
+  document.getElementById("badge-done").textContent=d+"/"+t;
+}
+const TODAY=new Date().toISOString().split("T")[0];
+let curM="all";
+function fM(m,el){curM=m;document.querySelectorAll(".mfb").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderLeica();}
+
+// ── SAVE PENDENCIAS ──────────────────────────────────────
+function savePend(di,val){
+  const k="pend-"+di;
+  if(val.trim()){S[k]=val;}else{delete S[k];}
+  try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}
+  // update card border
+  const card=document.getElementById("card-"+di);
+  if(card){
+    if(val.trim())card.classList.add("has-pend");
+    else card.classList.remove("has-pend");
+    const bub=card.querySelector(".day-bub");
+    if(bub)bub.style.background=val.trim()?"var(--orange)":"";
+  }
+  // show saved indicator
+  const el=document.getElementById("pst-"+di);
+  if(el){el.textContent="✓ salvo";el.classList.add("show");setTimeout(()=>el.classList.remove("show"),1800);}
+}
+
+// ── RENDER LEI SECA ──────────────────────────────────────
+function renderLeica(){
+  const q=(document.getElementById("srch").value||"").toLowerCase();
+  const root=document.getElementById("leica-root");root.innerHTML="";
+  let tot=0,done=0,dd=0;
+  SC.forEach((day,di)=>{
+    let dayAll=true;
+    ["q","j","r"].forEach(k=>{tot++;if(S["b-"+di+"-"+k])done++;else dayAll=false;});
+    day.items.forEach((_,ii)=>{tot++;if(S["l-"+di+"-"+ii])done++;else dayAll=false;});
+    if(dayAll)dd++;
+  });
+  document.getElementById("s-done").textContent=done;
+  document.getElementById("s-total").textContent=tot;
+  document.getElementById("s-dd").textContent=dd;
+  document.getElementById("s-dl").textContent=76-dd;
+  const pct=tot>0?Math.round(done/tot*100):0;
+  document.getElementById("gpct").textContent=pct+"%";
+  document.getElementById("gfill").style.width=pct+"%";
+  document.getElementById("glbl").textContent=done+" de "+tot+" itens — "+pct+"% concluído";
+  // today banner
+  const td=SC.find(d=>d.date===TODAY);
+  const banner=document.getElementById("today-banner");
+  if(td){
+    banner.innerHTML=`<div class="tbanner"><h3>📖 Hoje — Dia ${td.d} · ${td.dd} (${td.wd})</h3><p>Bloco 2 · 1h30 · lei seca a ler:</p><div class="tlist">${td.items.map(i=>`<div class="ti">${i}</div>`).join("")}</div></div>`;
+  }else{banner.innerHTML="";}
+  // render cards
+  SC.forEach((day,di)=>{
+    if(curM!=="all"&&day.date.slice(0,7)!==curM)return;
+    if(q){const m=day.items.some(it=>it.toLowerCase().includes(q))||day.dd.includes(q)||String(day.d)===q;if(!m)return;}
+    const lDone=day.items.filter((_,ii)=>S["l-"+di+"-"+ii]).length;
+    const lPct=day.items.length>0?Math.round(lDone/day.items.length*100):0;
+    const bQ=S["b-"+di+"-q"],bJ=S["b-"+di+"-j"],bR=S["b-"+di+"-r"];
+    const allDone=lDone===day.items.length&&bQ&&bJ&&bR;
+    const isToday=day.date===TODAY;
+    const pend=S["pend-"+di]||"";
+    const hasPend=pend.trim().length>0;
+    // build card
+    const card=document.createElement("div");
+    card.id="card-"+di;
+    card.className="card"+(allDone?" done-card":"")+(isToday?" today-card":"")+(hasPend?" has-pend":"");
+    // lei seca items
+    const lItems=day.items.map((item,ii)=>{
+      const k="l-"+di+"-"+ii;
+      return `<div class="it lei ${S[k]?"done":""}" onclick="tg('${k}')"><div class="ck"></div><div class="it-txt">${item}</div></div>`;
+    }).join("");
+    card.innerHTML=`
+      <div class="card-hd">
+        <div style="display:flex;align-items:center;gap:.42rem">
+          <div class="day-bub" style="${hasPend?"background:var(--orange)":""}">${day.d}</div>
+          <div><div class="card-date">${day.dd}</div><div class="card-wd">${day.wd}</div></div>
+        </div>
+        <div class="pb-row">${lDone}/${day.items.length}<div class="pb"><div class="pbf" style="width:${lPct}%"></div></div></div>
+      </div>
+      <div class="card-body">
+        <div class="sb">
+          <div class="sb-hd q"><span class="sb-n">1</span><span class="sb-ttl">Questões</span><span class="sb-time">1h40</span></div>
+          <div class="sb-items"><div class="it quest ${bQ?"done":""}" onclick="tg('b-${di}-q')"><div class="ck"></div><div class="it-txt">30–40 questões da matéria do dia ✓</div></div></div>
+        </div>
+        <div class="sb">
+          <div class="sb-hd l"><span class="sb-n">2</span><span class="sb-ttl">Lei Seca</span><span class="sb-time">1h30</span></div>
+          <div class="sb-items">${lItems}</div>
+        </div>
+        <div class="sb">
+          <div class="sb-hd j"><span class="sb-n">3</span><span class="sb-ttl">Jurisprudência</span><span class="sb-time">40min</span></div>
+          <div class="sb-items"><div class="it juris ${bJ?"done":""}" onclick="tg('b-${di}-j')"><div class="ck"></div><div class="it-txt">Informativos STF e STJ ✓</div></div></div>
+        </div>
+        <div class="sb">
+          <div class="sb-hd r"><span class="sb-n">4</span><span class="sb-ttl">Revisão</span><span class="sb-time">10min</span></div>
+          <div class="sb-items"><div class="it rev ${bR?"done":""}" onclick="tg('b-${di}-r')"><div class="ck"></div><div class="it-txt">Revisão dos erros e anotações ✓</div></div></div>
+        </div>
+      </div>
+      <div class="pend-section">
+        <div class="pend-label">📌 Pendências</div>
+        <textarea class="pend-textarea"
+          placeholder="Anote o que ficou pendente neste dia (leis não lidas, dúvidas, revisões necessárias…)"
+          oninput="savePend(${di},this.value)">${pend.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</textarea>
+        <div class="pend-status" id="pst-${di}"></div>
+      </div>
+      <div class="card-ft">
+        <button class="mark-btn" onclick="markDay(${di})">${allDone?"↺ Desmarcar dia":"✓ Marcar dia completo"}</button>
+        <div class="pb-row" style="font-size:.54rem">${pct}%</div>
+      </div>`;
+    root.appendChild(card);
+  });
+}
+
+function tg(key){S[key]=!S[key];save();renderLeica();}
+function markDay(di){
+  const day=SC[di];
+  const lAll=day.items.every((_,ii)=>S["l-"+di+"-"+ii]);
+  const v=!(lAll&&S["b-"+di+"-q"]&&S["b-"+di+"-j"]&&S["b-"+di+"-r"]);
+  ["q","j","r"].forEach(k=>{S["b-"+di+"-"+k]=v;});
+  day.items.forEach((_,ii)=>{S["l-"+di+"-"+ii]=v;});
+  save();renderLeica();
+}
+function resetLeica(){
+  if(!confirm("Reiniciar progresso da lei seca?"))return;
+  Object.keys(S).filter(k=>k.startsWith("l-")||k.startsWith("b-")).forEach(k=>delete S[k]);
+  save();renderLeica();
+}
+
+// ── MONTHLY CALENDAR ──────────────────────────────────────
+function popMY(){
+  const sel=document.getElementById("my");
+  const months=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+  const now=new Date();
+  for(let y=now.getFullYear();y<=now.getFullYear()+1;y++){
+    for(let m=0;m<12;m++){
+      const o=document.createElement("option");
+      o.value=y+"-"+m;o.textContent=months[m]+" "+y;
+      if(y===now.getFullYear()&&m===now.getMonth())o.selected=true;
+      sel.appendChild(o);
+    }
+  }
+}
+function renderCal(){
+  const root=document.getElementById("cal-root");root.innerHTML="";
+  const[y,m]=document.getElementById("my").value.split("-").map(Number);
+  const dIM=new Date(y,m+1,0).getDate();
+  const firstDow=new Date(y,m,1).getDay();
+  const todayObj=new Date();
+  const dow0=(firstDow===0)?6:firstDow-1;
+  WEEK_THEMES.forEach((wt,wi)=>{
+    const sec=document.createElement("div");sec.className="wblk "+wt.cls;
+    let wD=0,wT=0;
+    for(let d=0;d<7;d++){
+      const cd=wi*7+d-dow0+1;
+      if(cd<1||cd>dIM)continue;
+      G_DAYS[d].tasks.forEach((_,ti)=>{const k="c-"+y+"-"+m+"-"+wi+"-"+d+"-"+ti;wT++;if(S[k])wD++;});
+    }
+    const pct=wT>0?Math.round(wD/wT*100):0;
+    sec.innerHTML=`<div class="whd" onclick="this.parentElement.classList.toggle('closed')"><h3>${wt.label}<span class="wtg">${wt.focus}</span></h3><div style="display:flex;align-items:center;gap:.5rem"><div class="pb-row">${wD}/${wT}<div class="pb"><div class="pbf" style="width:${pct}%"></div></div>${pct}%</div><span class="chev">▾</span></div></div><div class="wb-body"><div class="dgrid" id="cg-${wi}"></div></div>`;
+    root.appendChild(sec);
+    const grid=sec.querySelector("#cg-"+wi);
+    for(let d=0;d<7;d++){
+      const cd=wi*7+d-dow0+1;
+      const col=document.createElement("div");
+      const isSun=d===6;col.className="dcol"+(isSun?" sun-col":"");
+      const valid=cd>=1&&cd<=dIM;
+      const ds=valid?(y+"-"+String(m+1).padStart(2,"0")+"-"+String(cd).padStart(2,"0")):"";
+      const isT=valid&&y===todayObj.getFullYear()&&m===todayObj.getMonth()&&cd===todayObj.getDate();
+      if(isT)col.classList.add("today-col");
+      const lsDay=ds&&DATE2DAY[ds]?DATE2DAY[ds]:null;
+      // check if that day has a pendencia
+      const diForDate=lsDay?lsDay-1:null;
+      const hasPend=diForDate!==null&&S["pend-"+diForDate]&&S["pend-"+diForDate].trim();
+      if(!valid){col.innerHTML=`<div class="dname">${G_DAYS[d].n}</div><div class="dtasks"></div>`;}
+      else if(isSun){col.innerHTML=`<div class="dname">${G_DAYS[d].n}<span class="dnum">${cd}</span></div><div class="sun-rest">☀️ Descanso</div>`;}
+      else{
+        const tasks=G_DAYS[d].tasks.map((t,ti)=>{const k="c-"+y+"-"+m+"-"+wi+"-"+d+"-"+ti;return `<div class="ctask ${t.c} ${S[k]?"done":""}" onclick="tgC('${k}')"><div class="cck"></div><span>${t.t}</span></div>`;}).join("");
+        col.innerHTML=`<div class="dname">${G_DAYS[d].n}<span class="dnum">${cd}</span></div><div class="dtasks">${tasks}</div><div class="dmeta">${lsDay?`<span class="leica-ref">📖 Dia ${lsDay}${hasPend?' 📌':''}</span>`:'<span style="color:var(--muted)">—</span>'}</div>`;
+      }
+      grid.appendChild(col);
+    }
+  });
+}
+function tgC(k){S[k]=!S[k];save();renderCal();}
+function resetCal(){
+  if(!confirm("Reiniciar progresso mensal?"))return;
+  Object.keys(S).filter(k=>k.startsWith("c-")).forEach(k=>delete S[k]);
+  save();renderCal();
+}
+
+// ── READING LISTS ──────────────────────────────────────
+function renderRL(){
+  rL("humanist-list",HUMANIST,"h");rL("difusos-list",DIFUSOS,"d");
+}
+function rL(id,items,p){
+  document.getElementById(id).innerHTML=items.map((item,i)=>`<div class="ri ${S["r-"+p+"-"+i]?"done":""}" onclick="tgR('r-${p}-${i}')"><span class="rn">${String(i+1).padStart(2,"0")}</span><span class="rname">${item}</span><div class="rck"></div></div>`).join("");
+}
+function tgR(k){S[k]=!S[k];save();renderRL();}
+
+// ── INIT ──────────────────────────────────────
+document.getElementById("hd-date").textContent=new Date().toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"short",year:"numeric"});
+popMY();renderCal();renderLeica();renderRL();updateBadge();
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Concursos Pro</title>
+<title>KALIL</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -546,6 +546,14 @@ function startEdit(el,onSave){
 
 // ==================== MATÉRIAS ====================
 let curMat=null;
+let subPanelOpen={};
+function toggleSubPanel(key){
+  subPanelOpen[key]=subPanelOpen[key]===false?true:false;
+  const panel=document.getElementById(`sub_panel_${key}`);
+  const btn=document.querySelector(`button[onclick="toggleSubPanel('${key}')"]`);
+  if(panel)panel.style.display=subPanelOpen[key]===false?'none':'block';
+  if(btn)btn.textContent=subPanelOpen[key]===false?'+':'−';
+}
 function addMateria(){
   const v=document.getElementById('novaMateria').value.trim();if(!v)return;
   data.materias.push({nome:v,topicos:[]});document.getElementById('novaMateria').value='';save();renderMaterias();
@@ -662,6 +670,8 @@ function renderMaterias(){
         const subsDone=subs.filter(s=>s.done).length;
         const subsHoje=subs.filter(s=>s.proximaRevisao&&daysDiff(s.proximaRevisao)<=0).length;
         const temRev=t.temRevisao!==false;
+        const subKey=`${mi}_${ti}`;
+        const subOpen=subPanelOpen[subKey]!==false;
         return`<div class="item">
           <div class="flex">${temRev?dominioRing(t):`<div style="width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📂</div>`}<div style="flex:1;min-width:0">
             <div class="flex" style="flex-wrap:wrap;gap:4px">
@@ -669,13 +679,15 @@ function renderMaterias(){
               ${temRev?metodoBadge(t.metodo||'nova'):'<span class="tag">Agrupador</span>'} ${temRev?recursosTags(t):''}
               <div class="spacer"></div>
               ${temRev?dominioBadge(t)+' '+intBadge(t.intervalAtual||1):''}
+              ${subs.length?`<span style="font-size:10px;color:var(--text2)">${subsDone}/${subs.length}</span>`:''}
+              <button onclick="toggleSubPanel('${subKey}')" style="background:none;border:1px solid var(--border);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:11px;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;line-height:1">${subOpen?'−':'+'}</button>
               ${temRev?`<button class="btn sm" onclick="openRevModal(${mi},${ti})">Revisar</button>`:''}
               <button class="btn sm danger" onclick="deleteTopico(${mi},${ti})">✕</button>
             </div>
-            ${temRev?`<div class="item-sub">Acertos: ${t.acertos}% · ${t.qtdQ||0}q · ${t.revisoes||1} rev. · Próx: ${fmtDate(t.proximaRevisao)} ${revBadge(t.proximaRevisao)}</div>`:`<div class="item-sub">${subs.length} sub-assunto${subs.length!==1?'s':''} · clique em + para adicionar</div>`}
+            ${temRev?`<div class="item-sub">Acertos: ${t.acertos}% · ${t.qtdQ||0}q · ${t.revisoes||1} rev. · Próx: ${fmtDate(t.proximaRevisao)} ${revBadge(t.proximaRevisao)}</div>`:`<div class="item-sub">${subs.length} sub-assunto${subs.length!==1?'s':''}</div>`}
             ${temRev?`<div class="acerto-bar"><div class="acerto-fill" style="width:${t.acertos}%;background:${bc}"></div></div>`:''}
           </div></div>
-          <div class="sub-assuntos">
+          <div id="sub_panel_${subKey}" class="sub-assuntos" style="${subOpen?'':'display:none'}">
             ${subs.map((s,si)=>{
               const sRev=s.proximaRevisao?daysDiff(s.proximaRevisao):null;
               const sRevBadge=sRev!==null?(sRev<=0?`<span class="sub-rev-badge" style="background:var(--red-bg);color:var(--red-txt)">Rev hoje</span>`:`<span class="sub-rev-badge" style="background:var(--blue-bg);color:var(--blue-txt)">${sRev}d</span>`):'';

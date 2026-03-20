@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concursos Pro</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f5f5f3;--surface:#ffffff;--border:#e5e5e3;--border2:#d0d0cc;
+    --text:#1a1a1a;--text2:#666;--text3:#999;
+    --green:#1D9E75;--green-dark:#0F6E56;--green-bg:#EAF3DE;--green-txt:#3B6D11;
+    --amber-bg:#FAEEDA;--amber-txt:#854F0B;
+    --red:#E24B4A;--red-bg:#FCEBEB;--red-txt:#A32D2D;
+    --today-bg:#E1F5EE;--today-txt:#0F6E56;
+    --radius:10px;--radius-sm:7px;
+  }
+  @media(prefers-color-scheme:dark){
+    :root{
+      --bg:#1a1a1a;--surface:#242424;--border:#333;--border2:#444;
+      --text:#f0f0f0;--text2:#aaa;--text3:#666;
+      --green-bg:#0a2e1f;--green-txt:#5DCAA5;
+      --amber-bg:#2e1f0a;--amber-txt:#FAC775;
+      --red-bg:#2e0a0a;--red-txt:#F09595;
+      --today-bg:#0a2e1f;--today-txt:#5DCAA5;
+    }
+  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .app{max-width:900px;margin:0 auto;padding:16px}
+  .header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .header-title{font-size:20px;font-weight:600}
+  .header-sub{font-size:12px;color:var(--text2);margin-top:2px}
+  .nav{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-bottom:14px;flex-wrap:wrap}
+  .nav button{flex:1;padding:8px 10px;border:none;border-radius:var(--radius-sm);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;transition:.15s;white-space:nowrap;min-width:70px}
+  .nav button.active{background:var(--bg);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .nav button:hover:not(.active){background:var(--bg)}
+  .page{display:none}.page.active{display:block}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+  .metric{background:var(--bg);border-radius:var(--radius-sm);padding:14px;text-align:center}
+  .metric .val{font-size:26px;font-weight:700;display:block}
+  .metric .lbl{font-size:11px;color:var(--text2);margin-top:4px;display:block}
+  h2{font-size:15px;font-weight:600;margin-bottom:12px}
+  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+  .badge.today{background:var(--today-bg);color:var(--today-txt)}
+  .badge.late{background:var(--red-bg);color:var(--red-txt)}
+  .badge.ok{background:var(--green-bg);color:var(--green-txt)}
+  .badge.soon{background:var(--amber-bg);color:var(--amber-txt)}
+  input[type=text],input[type=number],select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;background:var(--surface);color:var(--text);margin-bottom:8px;outline:none;transition:.15s}
+  input:focus,select:focus{border-color:var(--green)}
+  .btn{padding:8px 16px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;transition:.15s;font-weight:500}
+  .btn:hover{background:var(--bg)}
+  .btn.primary{background:var(--green);color:#fff;border-color:var(--green)}
+  .btn.primary:hover{background:var(--green-dark)}
+  .btn.danger{background:var(--red);color:#fff;border-color:var(--red)}
+  .btn.sm{padding:4px 10px;font-size:12px}
+  .flex{display:flex;align-items:center;gap:8px}
+  .spacer{flex:1}
+  .divider{border:none;border-top:1px solid var(--border);margin:12px 0}
+  .item{padding:10px 0;border-bottom:1px solid var(--border)}
+  .item:last-child{border-bottom:none}
+  .item-title{font-size:14px;font-weight:600}
+  .item-sub{font-size:12px;color:var(--text2);margin-top:3px}
+  .progress-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:6px}
+  .progress-fill{height:100%;background:var(--green);border-radius:4px;transition:.3s}
+  .pomo-display{text-align:center;padding:2.5rem 0}
+  .pomo-time{font-size:64px;font-weight:700;letter-spacing:-3px;margin-bottom:8px}
+  .pomo-label{font-size:13px;color:var(--text2);margin-bottom:28px}
+  .pomo-btns{display:flex;gap:10px;justify-content:center}
+  .empty{text-align:center;padding:2rem;color:var(--text3);font-size:13px}
+  .tag{font-size:11px;background:var(--bg);color:var(--text2);padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .acerto-bar{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin-top:5px;width:100%}
+  .acerto-fill{height:100%;border-radius:3px;transition:.3s}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--surface);border-radius:var(--radius);padding:24px;width:90%;max-width:420px;max-height:85vh;overflow-y:auto;border:1px solid var(--border)}
+  .modal h3{margin-bottom:16px;font-size:16px;font-weight:600}
+  .chart-bar{display:flex;align-items:flex-end;gap:4px;height:80px}
+  .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .chart-fill{width:100%;border-radius:3px 3px 0 0;min-height:2px;transition:.5s}
+  .chart-x{font-size:10px;color:var(--text2)}
+  .checkbox{width:20px;height:20px;border-radius:5px;border:2px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s}
+  .checkbox.done{background:var(--green);border-color:var(--green);color:#fff;font-size:12px}
+  .tab-sub{display:flex;gap:4px;margin-bottom:12px}
+  .tab-sub button{padding:5px 14px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text2);font-size:12px;cursor:pointer;font-weight:500}
+  .tab-sub button.active{background:var(--green);color:#fff;border-color:var(--green)}
+  /* DOMÍNIO */
+  .dominio-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap}
+  .dominio-forte{background:var(--green-bg);color:var(--green-txt)}
+  .dominio-medio{background:var(--amber-bg);color:var(--amber-txt)}
+  .dominio-fraco{background:var(--red-bg);color:var(--red-txt)}
+  .score-ring{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;font-size:12px;font-weight:700;flex-shrink:0}
+  .score-forte{background:var(--green-bg);color:var(--green-txt);border:2px solid #639922}
+  .score-medio{background:var(--amber-bg);color:var(--amber-txt);border:2px solid #EF9F27}
+  .score-fraco{background:var(--red-bg);color:var(--red-txt);border:2px solid var(--red)}
+  .dominio-legenda{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .dominio-legenda span{font-size:12px;padding:4px 12px;border-radius:20px;font-weight:600}
+  .row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .row label{font-size:13px;color:var(--text2);white-space:nowrap;min-width:90px}
+  @media(max-width:600px){
+    .grid2,.grid3{grid-template-columns:1fr}
+    .pomo-time{font-size:48px}
+    .nav button{font-size:12px;padding:6px 8px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <div class="header-title">📚 Concursos Pro</div>
+      <div class="header-sub" id="streakLabel">🔥 0 dias de streak</div>
+    </div>
+    <div class="spacer"></div>
+    <div style="font-size:12px;color:var(--text2);text-align:right" id="dateLabel"></div>
+  </div>
+
+  <div class="nav">
+    <button class="active" onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('materias')">Matérias</button>
+    <button onclick="showPage('revisoes')">Revisões</button>
+    <button onclick="showPage('metas')">Metas</button>
+    <button onclick="showPage('pomodoro')">Pomodoro</button>
+    <button onclick="showPage('stats')">Estatísticas</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="grid3" id="dashMetrics"></div>
+    <div class="grid2">
+      <div class="card"><h2>Revisões de hoje</h2><div id="dashRevisoes"></div></div>
+      <div class="card"><h2>Metas do dia</h2><div id="dashMetas"></div></div>
+    </div>
+    <div class="card">
+      <h2>Histórico semanal (minutos estudados)</h2>
+      <div class="chart-bar" id="weekChart"></div>
+    </div>
+  </div>
+
+  <!-- MATÉRIAS -->
+  <div class="page" id="page-materias">
+    <div class="card">
+      <h2>Nova matéria</h2>
+      <div class="flex">
+        <input type="text" id="novaMateria" placeholder="Ex: Direito Constitucional, Informática..." style="margin:0">
+        <button class="btn primary" onclick="addMateria()">Adicionar</button>
+      </div>
+    </div>
+    <div class="dominio-legenda">
+      <span class="dominio-forte">🟢 Forte — ≥80% e ≥3 revisões</span>
+      <span class="dominio-medio">🟡 Médio — ≥60% ou ≥2 revisões</span>
+      <span class="dominio-fraco">🔴 Fraco — &lt;60% e &lt;2 revisões</span>
+    </div>
+    <div id="listaMaterias"></div>
+  </div>
+
+  <!-- REVISÕES -->
+  <div class="page" id="page-revisoes">
+    <div class="tab-sub">
+      <button class="active" onclick="setRevTab('hoje',this)">Hoje</button>
+      <button onclick="setRevTab('proximas',this)">Próximas</button>
+      <button onclick="setRevTab('todas',this)">Todas</button>
+    </div>
+    <div id="listaRevisoes"></div>
+  </div>
+
+  <!-- METAS -->
+  <div class="page" id="page-metas">
+    <div class="card">
+      <h2>Nova meta para hoje</h2>
+      <input type="text" id="novaMeta" placeholder="Ex: Estudar 3 matérias, resolver 50 questões, 2h de estudo...">
+      <button class="btn primary" onclick="addMeta()" style="width:100%">Adicionar meta</button>
+    </div>
+    <div id="listaMetas"></div>
+  </div>
+
+  <!-- POMODORO -->
+  <div class="page" id="page-pomodoro">
+    <div class="card">
+      <div class="pomo-display">
+        <div class="pomo-time" id="pomoTime">25:00</div>
+        <div class="pomo-label" id="pomoLabel">Foco — 25 minutos</div>
+        <div class="pomo-btns">
+          <button class="btn primary" id="pomoBtn" onclick="togglePomo()">▶ Iniciar</button>
+          <button class="btn" onclick="resetPomo()">↺ Resetar</button>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="flex" style="justify-content:center;gap:24px">
+        <div class="metric" style="min-width:110px"><span class="val" id="pomoSessions">0</span><span class="lbl">sessões hoje</span></div>
+        <div class="metric" style="min-width:110px"><span class="val" id="pomoMinutes">0</span><span class="lbl">min. estudados</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="page" id="page-stats">
+    <div class="card">
+      <h2>Nível de domínio por matéria</h2>
+      <div class="dominio-legenda">
+        <span class="dominio-forte">🟢 Forte</span>
+        <span class="dominio-medio">🟡 Médio</span>
+        <span class="dominio-fraco">🔴 Fraco</span>
+      </div>
+      <div id="statsMateria"></div>
+    </div>
+    <div class="card"><h2>Histórico de estudos</h2><div id="statsHistorico"></div></div>
+  </div>
+</div>
+
+<!-- MODAL: Adicionar tópico -->
+<div class="modal-overlay" id="modalTopico">
+  <div class="modal">
+    <h3>Adicionar tópico</h3>
+    <input type="text" id="topicoNome" placeholder="Nome do tópico">
+    <div class="row"><label>Acertos (%)</label><input type="number" id="topicoAcertos" min="0" max="100" value="70" style="margin:0"></div>
+    <div class="flex" style="margin-top:12px;justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn primary" onclick="saveTopico()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Registrar revisão -->
+<div class="modal-overlay" id="modalRevisao">
+  <div class="modal">
+    <h3>Registrar revisão</h3>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px;padding:8px 12px;background:var(--bg);border-radius:var(--radius-sm)" id="revisaoInfo"></div>
+    <div class="row"><label>Acertos (%)</label><input type="number" id="revisaoAcertos" min="0" max="100" value="80" style="margin:0"></div>
+    <div class="flex" style="margin-top:12px;justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn primary" onclick="saveRevisao()">Salvar revisão</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const S={
+  get(k){try{return JSON.parse(localStorage.getItem('cp_'+k))}catch{return null}},
+  set(k,v){localStorage.setItem('cp_'+k,JSON.stringify(v))}
+};
+
+let data={
+  materias:S.get('materias')||[],
+  metas:S.get('metas')||[],
+  streak:S.get('streak')||{count:0,lastDate:''},
+  sessions:S.get('sessions')||{},
+  pomMinutes:S.get('pomMinutes')||{}
+};
+
+function save(){
+  S.set('materias',data.materias);S.set('metas',data.metas);
+  S.set('streak',data.streak);S.set('sessions',data.sessions);S.set('pomMinutes',data.pomMinutes);
+}
+
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function fmtDate(s){if(!s)return'';return new Date(s+'T00:00:00').toLocaleDateString('pt-BR')}
+function daysDiff(s){
+  const a=new Date(todayStr()+'T00:00:00'),b=new Date(s+'T00:00:00');
+  return Math.round((b-a)/(1000*86400));
+}
+function nextRevDate(ac){
+  const t=new Date();
+  t.setDate(t.getDate()+(ac>=90?7:ac>=70?3:ac>=50?1:0));
+  return t.toISOString().slice(0,10);
+}
+
+// --- DOMÍNIO ---
+function calcDominio(t){
+  const rev=t.revisoes||1,ac=t.acertos||0;
+  const revFator=Math.min(rev/5,1)*100;
+  const score=Math.round(ac*0.7+revFator*0.3);
+  let nivel,emoji,cls;
+  if(ac>=80&&rev>=3){nivel='Forte';emoji='🟢';cls='dominio-forte';}
+  else if(ac>=60||rev>=2){nivel='Médio';emoji='🟡';cls='dominio-medio';}
+  else{nivel='Fraco';emoji='🔴';cls='dominio-fraco';}
+  return{nivel,emoji,cls,score,rev};
+}
+
+function dominioBadge(t){
+  const d=calcDominio(t);
+  return`<span class="dominio-badge ${d.cls}">${d.emoji} ${d.nivel}</span>`;
+}
+
+function dominioRing(t){
+  const d=calcDominio(t);
+  const rc=d.nivel==='Forte'?'score-forte':d.nivel==='Médio'?'score-medio':'score-fraco';
+  return`<div class="score-ring ${rc}">${d.score}</div>`;
+}
+
+function dominioMateria(m){
+  if(!m.topicos.length)return null;
+  const n=m.topicos.length;
+  const forte=m.topicos.filter(t=>calcDominio(t).nivel==='Forte').length;
+  const fraco=m.topicos.filter(t=>calcDominio(t).nivel==='Fraco').length;
+  if(forte/n>=0.6)return{nivel:'Forte',emoji:'🟢',cls:'dominio-forte'};
+  if(fraco/n>=0.5)return{nivel:'Fraco',emoji:'🔴',cls:'dominio-fraco'};
+  return{nivel:'Médio',emoji:'🟡',cls:'dominio-medio'};
+}
+
+function acertoBadge(p){
+  return p>=90?`<span class="badge ok">${p}%</span>`:p>=70?`<span class="badge soon">${p}%</span>`:`<span class="badge late">${p}%</span>`;
+}
+
+function revBadge(ds){
+  const d=daysDiff(ds);
+  if(d<0)return`<span class="badge late">Atrasado ${Math.abs(d)}d</span>`;
+  if(d===0)return`<span class="badge today">Hoje</span>`;
+  if(d<=3)return`<span class="badge soon">Em ${d}d</span>`;
+  return`<span class="badge ok">Em ${d}d</span>`;
+}
+
+function updateStreak(){
+  const today=todayStr(),st=data.streak;
+  if(st.lastDate===today)return;
+  const y=new Date();y.setDate(y.getDate()-1);
+  st.count=st.lastDate===y.toISOString().slice(0,10)?st.count+1:1;
+  st.lastDate=today;save();
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  render();
+}
+
+// MATÉRIAS
+let curMat=null;
+
+function addMateria(){
+  const v=document.getElementById('novaMateria').value.trim();
+  if(!v)return;
+  data.materias.push({nome:v,topicos:[]});
+  document.getElementById('novaMateria').value='';
+  save();renderMaterias();
+}
+
+function deleteMateria(i){
+  if(!confirm('Remover matéria e todos os tópicos?'))return;
+  data.materias.splice(i,1);save();renderMaterias();
+}
+
+function openAddTopico(mi){
+  curMat=mi;
+  document.getElementById('topicoNome').value='';
+  document.getElementById('topicoAcertos').value=70;
+  document.getElementById('modalTopico').classList.add('open');
+}
+
+function saveTopico(){
+  const nome=document.getElementById('topicoNome').value.trim();
+  const acertos=parseInt(document.getElementById('topicoAcertos').value)||70;
+  if(!nome)return;
+  data.materias[curMat].topicos.push({nome,acertos,dataEstudo:todayStr(),proximaRevisao:nextRevDate(acertos),revisoes:1});
+  updateStreak();save();closeModal();renderMaterias();
+}
+
+function renderMaterias(){
+  const el=document.getElementById('listaMaterias');
+  if(!data.materias.length){el.innerHTML='<div class="empty">Nenhuma matéria ainda. Adicione acima!</div>';return;}
+  el.innerHTML=data.materias.map((m,mi)=>{
+    const dm=dominioMateria(m);
+    return`<div class="card">
+      <div class="flex" style="flex-wrap:wrap;gap:6px">
+        <h2 style="margin:0">${m.nome}</h2>
+        <div class="spacer"></div>
+        ${dm?`<span class="dominio-badge ${dm.cls}">${dm.emoji} ${dm.nivel}</span>`:''}
+        <span class="tag">${m.topicos.length} tópico${m.topicos.length!==1?'s':''}</span>
+        <button class="btn sm primary" onclick="openAddTopico(${mi})">+ Tópico</button>
+        <button class="btn sm danger" onclick="deleteMateria(${mi})">✕</button>
+      </div>
+      ${m.topicos.length?`<div class="divider"></div>`+m.topicos.map((t,ti)=>{
+        const dom=calcDominio(t);
+        const barColor=dom.nivel==='Forte'?'#639922':dom.nivel==='Médio'?'#EF9F27':'#E24B4A';
+        return`<div class="item">
+          <div class="flex">
+            ${dominioRing(t)}
+            <div style="flex:1;min-width:0">
+              <div class="flex" style="flex-wrap:wrap;gap:4px">
+                <span class="item-title">${t.nome}</span>
+                <div class="spacer"></div>
+                ${dominioBadge(t)}
+                <button class="btn sm" onclick="openRevModal(${mi},${ti})">Revisar</button>
+                <button class="btn sm" onclick="deleteTopico(${mi},${ti})" style="color:var(--text2)">✕</button>
+              </div>
+              <div class="item-sub">Acertos: ${t.acertos}% · ${t.revisoes||1} revisão${(t.revisoes||1)!==1?'s':''} · Próx: ${fmtDate(t.proximaRevisao)} ${revBadge(t.proximaRevisao)}</div>
+              <div class="acerto-bar"><div class="acerto-fill" style="width:${t.acertos}%;background:${barColor}"></div></div>
+            </div>
+          </div>
+        </div>`;
+      }).join(''):'<div style="padding:8px 0;font-size:13px;color:var(--text3)">Nenhum tópico ainda</div>'}
+    </div>`;
+  }).join('');
+}
+
+function deleteTopico(mi,ti){
+  data.materias[mi].topicos.splice(ti,1);save();renderMaterias();
+}
+
+// REVISÕES
+let revTab='hoje';
+function setRevTab(t,btn){
+  revTab=t;
+  document.querySelectorAll('.tab-sub button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderRevisoes();
+}
+
+let curRevMat=null,curRevTop=null;
+function openRevModal(mi,ti){
+  curRevMat=mi;curRevTop=ti;
+  document.getElementById('revisaoInfo').textContent='Tópico: '+data.materias[mi].topicos[ti].nome+' — '+data.materias[mi].nome;
+  document.getElementById('revisaoAcertos').value=data.materias[mi].topicos[ti].acertos;
+  document.getElementById('modalRevisao').classList.add('open');
+}
+
+function saveRevisao(){
+  const acertos=parseInt(document.getElementById('revisaoAcertos').value)||80;
+  const t=data.materias[curRevMat].topicos[curRevTop];
+  t.acertos=acertos;t.dataEstudo=todayStr();t.proximaRevisao=nextRevDate(acertos);t.revisoes=(t.revisoes||1)+1;
+  updateStreak();
+  const h=data.sessions[todayStr()]||{mins:0,revisoes:0};h.revisoes++;data.sessions[todayStr()]=h;
+  save();closeModal();renderAll();
+}
+
+function renderRevisoes(){
+  const el=document.getElementById('listaRevisoes');
+  let items=[];
+  data.materias.forEach((m,mi)=>m.topicos.forEach((t,ti)=>items.push({m,t,mi,ti,diff:daysDiff(t.proximaRevisao)})));
+  let filtered=revTab==='hoje'?items.filter(x=>x.diff<=0):revTab==='proximas'?items.filter(x=>x.diff>0).sort((a,b)=>a.diff-b.diff):items.sort((a,b)=>a.diff-b.diff);
+  if(!filtered.length){el.innerHTML=`<div class="empty">Nenhuma revisão ${revTab==='hoje'?'para hoje':'encontrada'}! ${revTab==='hoje'?'🎉':''}</div>`;return;}
+  el.innerHTML=filtered.map(x=>`
+    <div class="card" style="margin-bottom:8px">
+      <div class="flex">
+        ${dominioRing(x.t)}
+        <div style="flex:1;min-width:0">
+          <div class="flex" style="flex-wrap:wrap;gap:4px">
+            <span class="item-title">${x.t.nome}</span>
+            <div class="spacer"></div>
+            ${dominioBadge(x.t)} ${revBadge(x.t.proximaRevisao)}
+            <button class="btn sm primary" onclick="openRevModal(${x.mi},${x.ti})">Revisar</button>
+          </div>
+          <div class="item-sub">${x.m.nome} · ${x.t.revisoes||1} revisão${(x.t.revisoes||1)!==1?'s':''} · Acertos: ${x.t.acertos}%</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// METAS
+function addMeta(){
+  const v=document.getElementById('novaMeta').value.trim();if(!v)return;
+  data.metas.push({texto:v,done:false,data:todayStr()});
+  document.getElementById('novaMeta').value='';save();renderMetas();
+}
+
+function toggleMeta(i){data.metas[i].done=!data.metas[i].done;save();renderMetas();renderDash();}
+function deleteMeta(i){data.metas.splice(i,1);save();renderMetas();}
+
+function renderMetas(){
+  const el=document.getElementById('listaMetas');
+  const today=data.metas.filter(m=>m.data===todayStr());
+  if(!today.length){el.innerHTML='<div class="empty">Nenhuma meta hoje. Adicione acima!</div>';return;}
+  const done=today.filter(m=>m.done).length,pct=Math.round(done/today.length*100);
+  el.innerHTML=`<div class="card"><div class="flex" style="margin-bottom:8px"><span style="font-size:13px;color:var(--text2)">${done}/${today.length} concluídas</span><div class="spacer"></div><span style="font-size:14px;font-weight:700;color:${pct===100?'var(--green)':'var(--text)'}">${pct}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>`+
+  today.map(m=>{
+    const gi=data.metas.indexOf(m);
+    return`<div class="card" style="margin-bottom:6px"><div class="flex"><div class="checkbox ${m.done?'done':''}" onclick="toggleMeta(${gi})">${m.done?'✓':''}</div><span style="font-size:14px;${m.done?'text-decoration:line-through;color:var(--text2)':''}">${m.texto}</span><div class="spacer"></div><button class="btn sm" onclick="deleteMeta(${gi})" style="color:var(--text2)">✕</button></div></div>`;
+  }).join('');
+}
+
+// DASHBOARD
+function renderDash(){
+  const today=todayStr();
+  const revHoje=[];
+  data.materias.forEach((m,mi)=>m.topicos.forEach((t,ti)=>{if(daysDiff(t.proximaRevisao)<=0)revHoje.push({m,t,mi,ti});}));
+  const metasHoje=data.metas.filter(m=>m.data===today);
+  const metasDone=metasHoje.filter(m=>m.done).length;
+  const pomMin=data.pomMinutes[today]||0;
+
+  document.getElementById('dashMetrics').innerHTML=`
+    <div class="metric"><span class="val">${revHoje.length}</span><span class="lbl">Revisões hoje</span></div>
+    <div class="metric"><span class="val">${metasDone}/${metasHoje.length||0}</span><span class="lbl">Metas do dia</span></div>
+    <div class="metric"><span class="val">${pomMin}</span><span class="lbl">Min. estudados</span></div>`;
+
+  const dr=document.getElementById('dashRevisoes');
+  if(!revHoje.length){dr.innerHTML='<div class="empty" style="padding:1rem 0">✅ Sem revisões hoje!</div>';}
+  else{
+    dr.innerHTML=revHoje.slice(0,4).map(x=>`<div class="item"><div class="flex">${dominioRing(x.t)}<div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title">${x.t.nome}</span><div class="spacer"></div>${revBadge(x.t.proximaRevisao)}<button class="btn sm primary" onclick="openRevModal(${x.mi},${x.ti})">Revisar</button></div><div class="item-sub">${x.m.nome} ${dominioBadge(x.t)}</div></div></div></div>`).join('')+
+    (revHoje.length>4?`<div style="text-align:center;padding:8px;font-size:12px;color:var(--text2)">+${revHoje.length-4} mais</div>`:'');
+  }
+
+  const dm=document.getElementById('dashMetas');
+  if(!metasHoje.length){dm.innerHTML='<div class="empty" style="padding:1rem 0">Nenhuma meta hoje</div>';}
+  else{
+    const pct=Math.round(metasDone/metasHoje.length*100);
+    dm.innerHTML=`<div class="flex" style="margin-bottom:6px"><span style="font-size:13px;color:var(--text2)">${metasDone}/${metasHoje.length}</span><div class="spacer"></div><span style="font-size:14px;font-weight:700">${pct}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>`+
+    metasHoje.map(m=>`<div class="item"><div class="flex"><div class="checkbox ${m.done?'done':''}" onclick="toggleMeta(${data.metas.indexOf(m)})">${m.done?'✓':''}</div><span style="font-size:13px;${m.done?'text-decoration:line-through;color:var(--text2)':''}">${m.texto}</span></div></div>`).join('');
+  }
+  renderWeekChart();
+  document.getElementById('streakLabel').textContent='🔥 '+data.streak.count+' dia'+(data.streak.count!==1?'s':'')+' de streak';
+}
+
+function renderWeekChart(){
+  const days=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
+  const vals=days.map(d=>data.pomMinutes[d]||0);
+  const max=Math.max(...vals,1);
+  const nomes=['D','S','T','Q','Q','S','S'];
+  const dw=new Date().getDay();
+  document.getElementById('weekChart').innerHTML=days.map((d,i)=>{
+    const h=Math.round(vals[i]/max*72)+4;
+    const isT=d===todayStr();
+    return`<div class="chart-col"><div class="chart-fill" style="height:${h}px;background:${isT?'var(--green)':'var(--border)'}"></div><div class="chart-x">${nomes[(dw-6+i+7)%7]}</div></div>`;
+  }).join('');
+}
+
+// STATS
+function renderStats(){
+  const el=document.getElementById('statsMateria');
+  if(!data.materias.length){el.innerHTML='<div class="empty">Sem dados ainda</div>';return;}
+  const grupos={Forte:[],Médio:[],Fraco:[]};
+  data.materias.forEach(m=>m.topicos.forEach(t=>{const d=calcDominio(t);grupos[d.nivel].push({m,t,d});}));
+  el.innerHTML=`<div class="grid3" style="margin-bottom:16px">
+    <div class="metric"><span class="val" style="color:var(--green-txt)">${grupos['Forte'].length}</span><span class="lbl">🟢 Forte</span></div>
+    <div class="metric"><span class="val" style="color:var(--amber-txt)">${grupos['Médio'].length}</span><span class="lbl">🟡 Médio</span></div>
+    <div class="metric"><span class="val" style="color:var(--red-txt)">${grupos['Fraco'].length}</span><span class="lbl">🔴 Fraco</span></div>
+  </div>`+data.materias.map(m=>{
+    if(!m.topicos.length)return`<div class="item"><span class="item-title">${m.nome}</span> <span style="font-size:12px;color:var(--text2)">— sem tópicos</span></div>`;
+    const dm=dominioMateria(m);
+    const avgAc=Math.round(m.topicos.reduce((a,t)=>a+t.acertos,0)/m.topicos.length);
+    const avgRev=(m.topicos.reduce((a,t)=>a+(t.revisoes||1),0)/m.topicos.length).toFixed(1);
+    return`<div class="item">
+      <div class="flex" style="margin-bottom:8px;flex-wrap:wrap;gap:4px">
+        <span class="item-title">${m.nome}</span><div class="spacer"></div>
+        <span class="dominio-badge ${dm.cls}">${dm.emoji} ${dm.nivel}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;margin-bottom:6px">
+        ${m.topicos.map(t=>{const d=calcDominio(t);return`<div style="display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:var(--radius-sm);padding:7px 10px;"><span style="font-size:15px">${d.emoji}</span><div style="min-width:0;flex:1"><div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.nome}</div><div style="font-size:11px;color:var(--text2)">${t.acertos}% · ${t.revisoes||1} rev.</div></div></div>`;}).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--text2)">Média: ${avgAc}% acertos · ${avgRev} revisões/tópico</div>
+    </div>`;
+  }).join('');
+
+  const hEl=document.getElementById('statsHistorico');
+  const keys=Object.keys(data.sessions).sort().reverse().slice(0,14);
+  if(!keys.length){hEl.innerHTML='<div class="empty">Sem histórico ainda</div>';return;}
+  hEl.innerHTML=keys.map(d=>{
+    const s=data.sessions[d],pm=data.pomMinutes[d]||0;
+    return`<div class="item"><div class="flex"><span class="item-title">${fmtDate(d)}</span><div class="spacer"></div><span class="tag">${pm} min</span><span class="tag" style="margin-left:4px">${s.revisoes||0} revisões</span></div></div>`;
+  }).join('');
+}
+
+// POMODORO
+let pomoInterval=null,pomoRunning=false,pomoSeconds=25*60,pomoMode='focus',pomoSessHoje=0;
+function pomoFmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function togglePomo(){
+  if(pomoRunning){clearInterval(pomoInterval);pomoRunning=false;document.getElementById('pomoBtn').textContent='▶ Continuar';}
+  else{
+    pomoRunning=true;document.getElementById('pomoBtn').textContent='⏸ Pausar';
+    pomoInterval=setInterval(()=>{
+      pomoSeconds--;
+      document.getElementById('pomoTime').textContent=pomoFmt(pomoSeconds);
+      if(pomoMode==='focus'){
+        const min=Math.floor((25*60-pomoSeconds)/60),today=todayStr();
+        const cur=data.pomMinutes[today]||0;
+        if(min>cur){data.pomMinutes[today]=min;save();}
+        document.getElementById('pomoMinutes').textContent=data.pomMinutes[today]||0;
+      }
+      if(pomoSeconds<=0){
+        clearInterval(pomoInterval);pomoRunning=false;
+        if(pomoMode==='focus'){
+          pomoSessHoje++;document.getElementById('pomoSessions').textContent=pomoSessHoje;
+          pomoMode='break';pomoSeconds=5*60;
+          document.getElementById('pomoLabel').textContent='Descanso — 5 minutos';
+          document.getElementById('pomoBtn').textContent='▶ Iniciar';
+        }else{
+          pomoMode='focus';pomoSeconds=25*60;
+          document.getElementById('pomoLabel').textContent='Foco — 25 minutos';
+          document.getElementById('pomoBtn').textContent='▶ Iniciar';
+        }
+        document.getElementById('pomoTime').textContent=pomoFmt(pomoSeconds);
+      }
+    },1000);
+  }
+}
+function resetPomo(){
+  clearInterval(pomoInterval);pomoRunning=false;pomoMode='focus';pomoSeconds=25*60;
+  document.getElementById('pomoTime').textContent='25:00';
+  document.getElementById('pomoLabel').textContent='Foco — 25 minutos';
+  document.getElementById('pomoBtn').textContent='▶ Iniciar';
+}
+
+function closeModal(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));}
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeModal();}));
+
+function render(){
+  const id=document.querySelector('.page.active').id.replace('page-','');
+  if(id==='dashboard')renderDash();
+  else if(id==='materias')renderMaterias();
+  else if(id==='revisoes')renderRevisoes();
+  else if(id==='metas')renderMetas();
+  else if(id==='stats')renderStats();
+}
+function renderAll(){renderDash();renderMaterias();renderRevisoes();renderMetas();renderStats();}
+
+// Init
+const dn=['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+const nd=new Date();
+document.getElementById('dateLabel').textContent=dn[nd.getDay()]+', '+nd.toLocaleDateString('pt-BR');
+document.getElementById('pomoMinutes').textContent=data.pomMinutes[todayStr()]||0;
+renderAll();
+</script>
+</body>
+</html>

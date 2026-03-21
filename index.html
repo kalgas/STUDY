@@ -137,6 +137,19 @@ input:focus,select:focus{border-color:var(--green)}
 /* INTERVALO BADGE */
 .int-badge{display:inline-flex;align-items:center;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600;background:var(--blue-bg);color:var(--blue-txt);white-space:nowrap}
 .edit-hint{font-size:10px;color:var(--text3);margin-bottom:8px;padding:0 4px}
+.cfg-btn{padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;transition:.15s;font-weight:500}
+.cfg-btn:hover{background:var(--bg)}
+.cfg-btn.active{border-width:2px;font-weight:700}
+.cor-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:.15s;flex-shrink:0}
+.cor-dot.active{border-color:var(--text);transform:scale(1.15)}
+body[data-theme="dark"]{background:#1a1a1a!important;color:#f0f0f0!important}
+body[data-theme="dark"] .app,body[data-theme="dark"] .card,body[data-theme="dark"] .nav,body[data-theme="dark"] .modal,body[data-theme="dark"] .frase-card{background:#242424!important;border-color:#333!important}
+body[data-theme="dark"] input,body[data-theme="dark"] select{background:#242424!important;color:#f0f0f0!important;border-color:#444!important}
+body[data-theme="dark"] .metric,body[data-theme="dark"] .tag,body[data-theme="dark"] .sub-assuntos,body[data-theme="dark"] .acerto-bar,body[data-theme="dark"] .progress-bar{background:#1a1a1a!important}
+body[data-theme="dark"] .nav button{color:#aaa!important}
+body[data-theme="dark"] .nav button.active{color:#f0f0f0!important;background:#1a1a1a!important}
+body[data-theme="dark"] .item-sub,.item-sub{color:var(--text2)}
+body[data-theme="light"]{background:#f5f5f3!important;color:#1a1a1a!important}
 @media(max-width:600px){
   .grid2,.grid3,.grid4{grid-template-columns:1fr 1fr}
   .pomo-time,.crono-time{font-size:52px}
@@ -165,6 +178,7 @@ input:focus,select:focus{border-color:var(--green)}
     <button onclick="showPage('metas',this)">Metas</button>
     <button onclick="showPage('pomodoro',this)">Pomodoro</button>
     <button onclick="showPage('stats',this)">Estatísticas</button>
+    <button onclick="showPage('config',this)">⚙️ Config</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -290,7 +304,57 @@ input:focus,select:focus{border-color:var(--green)}
   </div>
 </div>
 
-<!-- MODAL: Adicionar tópico -->
+  <!-- CONFIGURAÇÕES -->
+  <div class="page" id="page-config">
+    <div class="card">
+      <h2>🎨 Aparência</h2>
+      <div class="divider"></div>
+
+      <div style="margin-bottom:20px">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Tema</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="cfg-btn" id="tema-auto" onclick="setTema('auto')">🌗 Automático</button>
+          <button class="cfg-btn" id="tema-light" onclick="setTema('light')">☀️ Claro</button>
+          <button class="cfg-btn" id="tema-dark" onclick="setTema('dark')">🌙 Escuro</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Cor de destaque</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="corOptions"></div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Fonte</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="cfg-btn" id="fonte-system" onclick="setFonte('system')" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">SF Pro / Sistema</button>
+          <button class="cfg-btn" id="fonte-inter" onclick="setFonte('inter')" style="font-family:'Inter',sans-serif">Inter</button>
+          <button class="cfg-btn" id="fonte-georgia" onclick="setFonte('georgia')" style="font-family:'Georgia',serif">Georgia</button>
+          <button class="cfg-btn" id="fonte-mono" onclick="setFonte('mono')" style="font-family:'Courier New',monospace">Monospace</button>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Tamanho da fonte</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="cfg-btn" id="size-sm" onclick="setSize('sm')">Pequeno</button>
+          <button class="cfg-btn" id="size-md" onclick="setSize('md')">Médio</button>
+          <button class="cfg-btn" id="size-lg" onclick="setSize('lg')">Grande</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📦 Dados</h2>
+      <div class="divider"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn primary" onclick="exportarDados()">⬇️ Exportar dados (JSON)</button>
+        <button class="btn" onclick="document.getElementById('importFile').click()">⬆️ Importar dados</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importarDados(event)">
+      </div>
+      <div style="font-size:11px;color:var(--text2);margin-top:10px">Exporte para fazer backup ou transferir para outro dispositivo.</div>
+    </div>
+  </div>
 <div class="modal-overlay" id="modalTopico">
   <div class="modal">
     <h3>Adicionar tópico</h3>
@@ -1128,10 +1192,126 @@ function render(){
   else if(id==='edital')renderEdital();
   else if(id==='metas')renderMetas();
   else if(id==='stats')renderStats();
+  else if(id==='config')renderConfig();
 }
 function renderAll(){renderDash();renderMaterias();renderRevisoes();renderEdital();renderMetas();}
 
-const dn=['domingo','segunda','terça','quarta','quinta','sexta','sábado'],nd=new Date();
+// ==================== CONFIGURAÇÕES ====================
+const CORES=[
+  {id:'verde',label:'Verde',accent:'#1D9E75',dark:'#0F6E56',bg:'#EAF3DE',txt:'#3B6D11'},
+  {id:'azul',label:'Azul',accent:'#185FA5',dark:'#0C447C',bg:'#E6F1FB',txt:'#0C447C'},
+  {id:'roxo',label:'Roxo',accent:'#534AB7',dark:'#3C3489',bg:'#EEEDFE',txt:'#3C3489'},
+  {id:'coral',label:'Coral',accent:'#D85A30',dark:'#993C1D',bg:'#FAECE7',txt:'#712B13'},
+  {id:'rosa',label:'Rosa',accent:'#D4537E',dark:'#993556',bg:'#FBEAF0',txt:'#72243E'},
+  {id:'preto',label:'Preto',accent:'#2C2C2A',dark:'#1a1a1a',bg:'#F1EFE8',txt:'#2C2C2A'},
+];
+const FONTES={
+  system:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",
+  inter:"'Inter',sans-serif",
+  georgia:"'Georgia',serif",
+  mono:"'Courier New',monospace"
+};
+const SIZES={sm:'12px',md:'13px',lg:'15px'};
+
+let cfg=JSON.parse(localStorage.getItem('cp_cfg')||'{}');
+if(!cfg.tema)cfg.tema='auto';
+if(!cfg.cor)cfg.cor='verde';
+if(!cfg.fonte)cfg.fonte='system';
+if(!cfg.size)cfg.size='md';
+
+function saveCfg(){localStorage.setItem('cp_cfg',JSON.stringify(cfg));}
+
+function applyConfig(){
+  // tema
+  const html=document.documentElement;
+  if(cfg.tema==='light'){html.style.colorScheme='light';document.body.style.background='';document.body.setAttribute('data-theme','light');}
+  else if(cfg.tema==='dark'){html.style.colorScheme='dark';document.body.setAttribute('data-theme','dark');}
+  else{html.style.colorScheme='';document.body.removeAttribute('data-theme');}
+
+  // cor de destaque
+  const cor=CORES.find(c=>c.id===cfg.cor)||CORES[0];
+  const root=document.documentElement;
+  root.style.setProperty('--green',cor.accent);
+  root.style.setProperty('--green-dark',cor.dark);
+  root.style.setProperty('--green-bg',cor.bg);
+  root.style.setProperty('--green-txt',cor.txt);
+  root.style.setProperty('--today-bg',cor.bg);
+  root.style.setProperty('--today-txt',cor.txt);
+
+  // fonte
+  document.body.style.fontFamily=FONTES[cfg.fonte]||FONTES.system;
+
+  // tamanho
+  document.body.style.fontSize=SIZES[cfg.size]||SIZES.md;
+}
+
+function setTema(t){
+  cfg.tema=t;saveCfg();applyConfig();renderConfig();
+}
+function setCor(c){
+  cfg.cor=c;saveCfg();applyConfig();renderConfig();
+}
+function setFonte(f){
+  cfg.fonte=f;saveCfg();applyConfig();renderConfig();
+}
+function setSize(s){
+  cfg.size=s;saveCfg();applyConfig();renderConfig();
+}
+
+function renderConfig(){
+  // tema botões
+  ['auto','light','dark'].forEach(t=>{
+    const b=document.getElementById('tema-'+t);
+    if(b)b.className='cfg-btn'+(cfg.tema===t?' active':'');
+    if(b&&cfg.tema===t)b.style.borderColor='var(--green)';
+    else if(b)b.style.borderColor='';
+  });
+  // fonte botões
+  ['system','inter','georgia','mono'].forEach(f=>{
+    const b=document.getElementById('fonte-'+f);
+    if(b)b.className='cfg-btn'+(cfg.fonte===f?' active':'');
+    if(b&&cfg.fonte===f)b.style.borderColor='var(--green)';
+    else if(b)b.style.borderColor='';
+  });
+  // size botões
+  ['sm','md','lg'].forEach(s=>{
+    const b=document.getElementById('size-'+s);
+    if(b)b.className='cfg-btn'+(cfg.size===s?' active':'');
+    if(b&&cfg.size===s)b.style.borderColor='var(--green)';
+    else if(b)b.style.borderColor='';
+  });
+  // cores
+  const container=document.getElementById('corOptions');
+  if(container){
+    container.innerHTML=CORES.map(c=>`<div class="cor-dot${cfg.cor===c.id?' active':''}" style="background:${c.accent}" title="${c.label}" onclick="setCor('${c.id}')"></div>`).join('');
+  }
+}
+
+// EXPORTAR / IMPORTAR
+function exportarDados(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='concursos-pro-backup.json';
+  a.click();
+}
+function importarDados(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      data=Object.assign(emptyData(),d);
+      save();renderAll();
+      showToast('✅ Dados importados com sucesso!');
+    }catch(err){showToast('❌ Arquivo inválido');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+applyConfig();
+
 document.getElementById('dateLabel').textContent=dn[nd.getDay()]+', '+nd.toLocaleDateString('pt-BR');
 loadData();resetPomo();
 document.getElementById('pomoMinutes').textContent=data.pomMinutes[todayStr()]||0;

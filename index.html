@@ -137,14 +137,12 @@ input:focus,select:focus{border-color:var(--green)}
 /* INTERVALO BADGE */
 .int-badge{display:inline-flex;align-items:center;font-size:10px;padding:1px 6px;border-radius:20px;font-weight:600;background:var(--blue-bg);color:var(--blue-txt);white-space:nowrap}
 .edit-hint{font-size:10px;color:var(--text3);margin-bottom:8px;padding:0 4px}
-.cfg-btn{padding:7px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;transition:.15s;font-weight:500}
-.cfg-btn:hover{background:var(--bg)}
-.cfg-btn.active{border-color:var(--green);border-width:2px;font-weight:700;color:var(--green)}
-.cor-dot{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:.2s;flex-shrink:0}
-.cor-dot.active{border-color:var(--text);transform:scale(1.18)}
-.emoji-opt{font-size:22px;cursor:pointer;padding:4px 6px;border-radius:6px;border:1.5px solid transparent;transition:.15s}
-.config-btn{position:fixed;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.08);z-index:40;transition:.25s;color:var(--text2)}
-.config-btn:hover{transform:rotate(60deg);color:var(--text);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.cfg-btn{padding:7px 16px;border:1px solid var(--border);border-radius:20px;background:var(--surface);color:var(--text2);font-size:13px;cursor:pointer;transition:.15s;font-weight:500}
+.cfg-btn:hover{background:var(--bg);color:var(--text)}
+.cfg-btn.active{border-color:var(--green);border-width:1.5px;font-weight:600;color:var(--green);background:var(--green-bg)}
+.cfg-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.config-btn{width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;box-shadow:0 1px 4px rgba(0,0,0,.08);transition:.25s;color:var(--text2);flex-shrink:0;font-style:normal}
+.config-btn:hover{transform:rotate(60deg);color:var(--text)}
 body[data-theme="dark"]{background:#141414!important;color:#f0f0f0!important}
 body[data-theme="dark"] .app,body[data-theme="dark"] .card,body[data-theme="dark"] .nav,body[data-theme="dark"] .modal,body[data-theme="dark"] .frase-card,body[data-theme="dark"] .config-btn{background:#1e1e1e!important;border-color:#2a2a2a!important}
 body[data-theme="dark"] input,body[data-theme="dark"] select{background:#1e1e1e!important;color:#f0f0f0!important;border-color:#333!important}
@@ -179,22 +177,22 @@ input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,
 <div class="app">
   <div class="header">
     <div style="flex:1">
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-        <span id="tituloEmoji" style="font-size:var(--titulo-size,24px);cursor:pointer;user-select:none" onclick="openEmojiPicker()" title="Trocar emoji">📚</span>
-        <div id="tituloTexto" class="editavel header-title" style="font-size:var(--titulo-size,24px);letter-spacing:-0.5px" onclick="editTitulo()">Concursos Pro</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="tituloEmoji" style="font-size:var(--titulo-size,22px);cursor:pointer;user-select:none" onclick="openEmojiPicker()" title="Trocar ícone">📚</span>
+        <div id="tituloTexto" class="editavel header-title" style="font-size:var(--titulo-size,22px);letter-spacing:-0.5px" onclick="editTitulo()">Concursos Pro</div>
       </div>
       <div class="header-sub" id="streakLabel">🔥 0 dias de streak</div>
     </div>
-    <div class="spacer"></div>
-    <div style="font-size:12px;color:var(--text2);text-align:right" id="dateLabel"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="font-size:12px;color:var(--text2);text-align:right" id="dateLabel"></div>
+      <button class="config-btn" onclick="showPage('config',null)" title="Configurações">⚙</button>
+    </div>
   </div>
 
-  <!-- EMOJI PICKER -->
-  <div id="emojiPicker" style="display:none;position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.12);flex-wrap:wrap;gap:6px;max-width:220px">
-    <div style="font-size:11px;color:var(--text2);width:100%;margin-bottom:4px">Escolha um emoji</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px">
-      ${['📚','📖','📝','🎓','💡','🏆','🎯','🚀','⭐','🔥','📊','🧠','✏️','📌','🗓️'].map(e=>`<span onclick="setEmoji('${e}')" style="font-size:20px;cursor:pointer;padding:3px;border-radius:4px" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">${e}</span>`).join('')}
-    </div>
+  <!-- EMOJI PICKER (preenchido pelo JS) -->
+  <div id="emojiPicker" style="display:none;position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:240px">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:500;text-transform:uppercase;letter-spacing:.5px">Escolha um ícone</div>
+    <div id="emojiPickerGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
   </div>
 
   <div class="nav">
@@ -207,19 +205,8 @@ input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,
     <button onclick="showPage('stats',this)">Estatísticas</button>
   </div>
 
-  <!-- BOTÃO CONFIG FLUTUANTE -->
-  <button class="config-btn" onclick="showPage('config',null)" title="Configurações">⚙️</button>
-
   <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
-    <div style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;margin-bottom:12px;font-size:12px;color:var(--text2)">
-      <span>💾</span>
-      <span>Seus dados ficam salvos neste navegador.</span>
-      <div class="spacer"></div>
-      <button class="btn sm primary" onclick="exportarDados()" style="white-space:nowrap">Exportar backup</button>
-      <button class="btn sm" onclick="document.getElementById('importFileDash').click()" style="white-space:nowrap">Importar</button>
-      <input type="file" id="importFileDash" accept=".json" style="display:none" onchange="importarDados(event)">
-    </div>
     <div class="frase-card">
       <button class="frase-btn" onclick="novaFrase()">🔄</button>
       <div class="frase-text" id="fraseText"></div>
@@ -343,20 +330,19 @@ input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,
 
   <!-- CONFIGURAÇÕES -->
   <div class="page" id="page-config">
-
     <div class="card">
-      <h2>✏️ Título da página</h2>
+      <h2>Título</h2>
       <div class="divider"></div>
-      <div style="margin-bottom:14px">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Pré-visualização</div>
-        <div style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--bg);border-radius:var(--radius-sm)">
-          <span id="prevEmoji" style="font-size:var(--titulo-size,24px)">📚</span>
-          <span id="prevTitulo" style="font-size:var(--titulo-size,24px);font-weight:700;letter-spacing:-0.5px">Concursos Pro</span>
+      <div style="margin-bottom:16px">
+        <div class="cfg-label">Pré-visualização</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border)">
+          <span id="prevEmoji" style="font-size:28px">📚</span>
+          <span id="prevTitulo" style="font-size:22px;font-weight:700;letter-spacing:-0.5px">Concursos Pro</span>
         </div>
       </div>
-      <div style="margin-bottom:14px">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Tamanho do título</div>
-        <div style="display:flex;gap:8px">
+      <div style="margin-bottom:16px">
+        <div class="cfg-label">Tamanho</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="cfg-btn" id="tsize-sm" onclick="setTituloSize('sm')">Pequeno</button>
           <button class="cfg-btn" id="tsize-md" onclick="setTituloSize('md')">Médio</button>
           <button class="cfg-btn" id="tsize-lg" onclick="setTituloSize('lg')">Grande</button>
@@ -364,50 +350,89 @@ input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,
         </div>
       </div>
       <div>
-        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Emoji</div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px">
-          ${['📚','📖','📝','🎓','💡','🏆','🎯','🚀','⭐','🔥','📊','🧠','✏️','📌','🗓️'].map(e=>`<span class="emoji-opt" onclick="setEmoji('${e}')" style="font-size:22px;cursor:pointer;padding:4px 6px;border-radius:6px;border:1.5px solid transparent">${e}</span>`).join('')}
+        <div class="cfg-label">Ícone</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="font-size:36px;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm)" id="emojiPreviewBig"></div>
+          <div style="flex:1">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Cole ou digite qualquer emoji</div>
+            <input type="text" id="emojiInput" placeholder="Ex: 🎯" style="margin:0;font-size:20px;width:100%;max-width:120px" oninput="onEmojiInput(this.value)">
+          </div>
         </div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Ou escolha um dos sugeridos:</div>
+        <div id="emojiGrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
       </div>
     </div>
 
     <div class="card">
-      <h2>🎨 Aparência</h2>
+      <h2>Aparência</h2>
       <div class="divider"></div>
 
       <div style="margin-bottom:20px">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Tema</div>
+        <div class="cfg-label">Tema</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="cfg-btn" id="tema-auto" onclick="setTema('auto')">🌗 Automático</button>
-          <button class="cfg-btn" id="tema-light" onclick="setTema('light')">☀️ Claro</button>
-          <button class="cfg-btn" id="tema-dark" onclick="setTema('dark')">🌙 Escuro</button>
+          <button class="cfg-btn" id="tema-auto" onclick="setTema('auto')">Automático</button>
+          <button class="cfg-btn" id="tema-light" onclick="setTema('light')">Claro</button>
+          <button class="cfg-btn" id="tema-dark" onclick="setTema('dark')">Escuro</button>
         </div>
       </div>
 
       <div style="margin-bottom:20px">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Cor de destaque</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center" id="corOptions"></div>
+        <div class="cfg-label">Cor de destaque</div>
+        <div id="corOptions" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="color" id="corCustom" onchange="setCorCustom(this.value)" style="width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;padding:2px;background:none">
+          <span style="font-size:12px;color:var(--text2)">Cor personalizada</span>
+          <span id="corCustomHex" style="font-size:11px;color:var(--text3);font-family:monospace"></span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="cfg-label">Cor do fundo</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px" id="bgOptions"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input type="color" id="bgCustom" onchange="setBgCustom(this.value)" style="width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;padding:2px;background:none">
+          <span style="font-size:12px;color:var(--text2)">Cor personalizada</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="cfg-label">Estilo dos cards</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="cfg-btn" id="card-default" onclick="setCardStyle('default')">Padrão</button>
+          <button class="cfg-btn" id="card-flat" onclick="setCardStyle('flat')">Sem borda</button>
+          <button class="cfg-btn" id="card-shadow" onclick="setCardStyle('shadow')">Com sombra</button>
+          <button class="cfg-btn" id="card-border" onclick="setCardStyle('border')">Borda colorida</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="cfg-label">Raio dos cantos</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="cfg-btn" id="radius-sharp" onclick="setRadius('sharp')">Reto</button>
+          <button class="cfg-btn" id="radius-soft" onclick="setRadius('soft')">Suave</button>
+          <button class="cfg-btn" id="radius-round" onclick="setRadius('round')">Redondo</button>
+        </div>
       </div>
 
       <div>
-        <div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Tamanho do texto</div>
+        <div class="cfg-label">Tamanho do texto</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="cfg-btn" id="size-sm" onclick="setSize('sm')" style="font-size:11px">Pequeno</button>
-          <button class="cfg-btn" id="size-md" onclick="setSize('md')" style="font-size:13px">Médio</button>
-          <button class="cfg-btn" id="size-lg" onclick="setSize('lg')" style="font-size:15px">Grande</button>
+          <button class="cfg-btn" id="size-sm" onclick="setSize('sm')">Pequeno</button>
+          <button class="cfg-btn" id="size-md" onclick="setSize('md')">Médio</button>
+          <button class="cfg-btn" id="size-lg" onclick="setSize('lg')">Grande</button>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h2>📦 Dados</h2>
+      <h2>Dados</h2>
       <div class="divider"></div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Seus dados ficam salvos neste navegador. Exporte regularmente para não perder nada caso troque de dispositivo ou limpe o cache.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn primary" onclick="exportarDados()">⬇️ Exportar (JSON)</button>
-        <button class="btn" onclick="document.getElementById('importFile').click()">⬆️ Importar</button>
+        <button class="btn primary" onclick="exportarDados()">Exportar backup</button>
+        <button class="btn" onclick="document.getElementById('importFile').click()">Importar backup</button>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importarDados(event)">
       </div>
-      <div style="font-size:11px;color:var(--text2);margin-top:10px">Exporte para backup ou transferir para outro dispositivo.</div>
     </div>
   </div>
 <div class="modal-overlay" id="modalTopico">
@@ -1275,12 +1300,25 @@ const CORES=[
   {id:'rosa',label:'Rosa',accent:'#D4537E',dark:'#993556',bg:'#FBEAF0',txt:'#72243E'},
   {id:'preto',label:'Preto',accent:'#2C2C2A',dark:'#1a1a1a',bg:'#F1EFE8',txt:'#2C2C2A'},
 ];
+const BG_PRESETS=[
+  {id:'default',label:'Padrão',light:'#f0efe9',dark:'#141414'},
+  {id:'white',label:'Branco',light:'#ffffff',dark:'#0a0a0a'},
+  {id:'warm',label:'Quente',light:'#faf7f2',dark:'#1a1510'},
+  {id:'cool',label:'Frio',light:'#f0f4f8',dark:'#101418'},
+  {id:'dark',label:'Grafite',light:'#e8e8e8',dark:'#1e1e1e'},
+];
 const TITULO_SIZES={sm:'18px',md:'24px',lg:'32px',xl:'42px'};
 const SIZES={sm:'12px',md:'13px',lg:'15px'};
+const RADIUS_PRESETS={sharp:'4px',soft:'10px',round:'18px'};
 
 let cfg=JSON.parse(localStorage.getItem('cp_cfg')||'{}');
 if(!cfg.tema)cfg.tema='auto';
 if(!cfg.cor)cfg.cor='verde';
+if(!cfg.corCustom)cfg.corCustom='';
+if(!cfg.bgPreset)cfg.bgPreset='default';
+if(!cfg.bgCustom)cfg.bgCustom='';
+if(!cfg.cardStyle)cfg.cardStyle='default';
+if(!cfg.radius)cfg.radius='soft';
 if(!cfg.size)cfg.size='md';
 if(!cfg.tituloSize)cfg.tituloSize='md';
 if(!cfg.tituloTexto)cfg.tituloTexto='Concursos Pro';
@@ -1288,26 +1326,84 @@ if(!cfg.tituloEmoji)cfg.tituloEmoji='📚';
 
 function saveCfg(){localStorage.setItem('cp_cfg',JSON.stringify(cfg));}
 
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return{r,g,b};
+}
+function darken(hex,amt=40){
+  const{r,g,b}=hexToRgb(hex);
+  return '#'+[r,g,b].map(v=>Math.max(0,v-amt).toString(16).padStart(2,'0')).join('');
+}
+function lighten(hex,amt=200){
+  const{r,g,b}=hexToRgb(hex);
+  return '#'+[r,g,b].map(v=>Math.min(255,v+amt).toString(16).padStart(2,'0')).join('');
+}
+function mix(hex,alpha=0.12){
+  const{r,g,b}=hexToRgb(hex);
+  const R=Math.round(255-(255-r)*alpha),G=Math.round(255-(255-g)*alpha),B=Math.round(255-(255-b)*alpha);
+  return '#'+[R,G,B].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
 function applyConfig(){
-  const html=document.documentElement;
-  if(cfg.tema==='light'){html.style.colorScheme='light';document.body.setAttribute('data-theme','light');}
-  else if(cfg.tema==='dark'){html.style.colorScheme='dark';document.body.setAttribute('data-theme','dark');}
-  else{html.style.colorScheme='';document.body.removeAttribute('data-theme');}
-
-  const cor=CORES.find(c=>c.id===cfg.cor)||CORES[0];
   const root=document.documentElement;
-  root.style.setProperty('--green',cor.accent);
-  root.style.setProperty('--green-dark',cor.dark);
-  root.style.setProperty('--green-bg',cor.bg);
-  root.style.setProperty('--green-txt',cor.txt);
-  root.style.setProperty('--today-bg',cor.bg);
-  root.style.setProperty('--today-txt',cor.txt);
+  const isDark=cfg.tema==='dark'||(cfg.tema==='auto'&&window.matchMedia('(prefers-color-scheme:dark)').matches);
 
+  // tema
+  if(cfg.tema==='light'){root.style.colorScheme='light';document.body.setAttribute('data-theme','light');}
+  else if(cfg.tema==='dark'){root.style.colorScheme='dark';document.body.setAttribute('data-theme','dark');}
+  else{root.style.colorScheme='';document.body.removeAttribute('data-theme');}
+
+  // cor de destaque — custom tem prioridade
+  let accent,accentDark,accentBg,accentTxt;
+  if(cfg.corCustom){
+    accent=cfg.corCustom;
+    accentDark=darken(cfg.corCustom,30);
+    accentBg=isDark?darken(cfg.corCustom,80):mix(cfg.corCustom,0.15);
+    accentTxt=isDark?lighten(cfg.corCustom,120):darken(cfg.corCustom,70);
+  } else {
+    const cor=CORES.find(c=>c.id===cfg.cor)||CORES[0];
+    accent=cor.accent;accentDark=cor.dark;accentBg=cor.bg;accentTxt=cor.txt;
+  }
+  root.style.setProperty('--green',accent);
+  root.style.setProperty('--green-dark',accentDark);
+  root.style.setProperty('--green-bg',accentBg);
+  root.style.setProperty('--green-txt',accentTxt);
+  root.style.setProperty('--today-bg',accentBg);
+  root.style.setProperty('--today-txt',accentTxt);
+
+  // cor do fundo — custom tem prioridade
+  if(cfg.bgCustom){
+    root.style.setProperty('--bg',cfg.bgCustom);
+  } else {
+    const bg=BG_PRESETS.find(b=>b.id===cfg.bgPreset)||BG_PRESETS[0];
+    root.style.setProperty('--bg',isDark?bg.dark:bg.light);
+  }
+
+  // estilo dos cards
+  if(cfg.cardStyle==='flat'){
+    root.style.setProperty('--card-border','none');
+    root.style.setProperty('--card-shadow','none');
+  } else if(cfg.cardStyle==='shadow'){
+    root.style.setProperty('--card-border','none');
+    root.style.setProperty('--card-shadow','0 2px 8px rgba(0,0,0,.10),0 8px 24px rgba(0,0,0,.06)');
+  } else if(cfg.cardStyle==='border'){
+    root.style.setProperty('--card-border',`2px solid ${accent}22`);
+    root.style.setProperty('--card-shadow','none');
+  } else {
+    root.style.setProperty('--card-border',`1px solid var(--border)`);
+    root.style.setProperty('--card-shadow','0 1px 3px rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.04)');
+  }
+
+  // raio
+  const r=RADIUS_PRESETS[cfg.radius]||RADIUS_PRESETS.soft;
+  root.style.setProperty('--radius',r);
+  root.style.setProperty('--radius-sm',`calc(${r} * 0.65)`);
+
+  // tamanho texto e título
   document.body.style.fontSize=SIZES[cfg.size]||SIZES.md;
+  root.style.setProperty('--titulo-size',TITULO_SIZES[cfg.tituloSize]||TITULO_SIZES.md);
 
-  const ts=TITULO_SIZES[cfg.tituloSize]||TITULO_SIZES.md;
-  root.style.setProperty('--titulo-size',ts);
-
+  // título
   const te=document.getElementById('tituloEmoji');
   const tt=document.getElementById('tituloTexto');
   const pe=document.getElementById('prevEmoji');
@@ -1317,20 +1413,49 @@ function applyConfig(){
   if(pe)pe.textContent=cfg.tituloEmoji;
   if(pt)pt.textContent=cfg.tituloTexto;
   document.title=cfg.tituloTexto;
+
+  // apply card style via CSS var
+  document.querySelectorAll('.card,.nav,.modal').forEach(el=>{
+    el.style.border=cfg.cardStyle==='flat'?'none':(cfg.cardStyle==='shadow'?'none':(cfg.cardStyle==='border'?`2px solid ${accent}22`:''));
+    el.style.boxShadow=cfg.cardStyle==='shadow'?'0 2px 8px rgba(0,0,0,.10),0 8px 24px rgba(0,0,0,.06)':(cfg.cardStyle==='flat'?'none':'');
+  });
 }
 
 function editTitulo(){
   const el=document.getElementById('tituloTexto');
   startEdit(el,newVal=>{cfg.tituloTexto=newVal||'Concursos Pro';saveCfg();applyConfig();});
 }
+function onEmojiInput(val){
+  const emoji=val.trim();
+  if(!emoji)return;
+  // pega só o primeiro "caractere" visual (emoji pode ter múltiplos code points)
+  const first=[...emoji][0];
+  if(first)setEmoji(first);
+}
+
 function setEmoji(e){
   cfg.tituloEmoji=e;saveCfg();applyConfig();
   document.getElementById('emojiPicker').style.display='none';
   renderConfig();
 }
+const EMOJIS=['📚','📖','📝','🎓','💡','🏆','🎯','🚀','⭐','🔥','📊','🧠','✏️','📌','🗓️'];
+
 function openEmojiPicker(){
   const p=document.getElementById('emojiPicker');
-  p.style.display=p.style.display==='none'?'flex':'none';
+  const grid=document.getElementById('emojiPickerGrid');
+  if(grid){
+    grid.innerHTML='';
+    EMOJIS.forEach(e=>{
+      const s=document.createElement('span');
+      s.textContent=e;
+      s.style.cssText='font-size:22px;cursor:pointer;padding:5px;border-radius:6px;display:inline-block;transition:.15s';
+      s.onmouseover=()=>s.style.background='var(--bg)';
+      s.onmouseout=()=>s.style.background='';
+      s.onclick=()=>setEmoji(e);
+      grid.appendChild(s);
+    });
+  }
+  p.style.display=p.style.display==='none'?'block':'none';
 }
 document.addEventListener('click',e=>{
   const p=document.getElementById('emojiPicker');
@@ -1338,43 +1463,109 @@ document.addEventListener('click',e=>{
 });
 
 function setTema(t){cfg.tema=t;saveCfg();applyConfig();renderConfig();}
-function setCor(c){cfg.cor=c;saveCfg();applyConfig();renderConfig();}
+function setCor(c){cfg.cor=c;cfg.corCustom='';saveCfg();applyConfig();renderConfig();}
+function setCorCustom(hex){cfg.corCustom=hex;cfg.cor='';saveCfg();applyConfig();renderConfig();}
+function setBgPreset(id){cfg.bgPreset=id;cfg.bgCustom='';saveCfg();applyConfig();renderConfig();}
+function setBgCustom(hex){cfg.bgCustom=hex;cfg.bgPreset='';saveCfg();applyConfig();renderConfig();}
+function setCardStyle(s){cfg.cardStyle=s;saveCfg();applyConfig();renderConfig();}
+function setRadius(r){cfg.radius=r;saveCfg();applyConfig();renderConfig();}
 function setSize(s){cfg.size=s;saveCfg();applyConfig();renderConfig();}
 function setTituloSize(s){cfg.tituloSize=s;saveCfg();applyConfig();renderConfig();}
 
 function renderConfig(){
+  // tema
   ['auto','light','dark'].forEach(t=>{
     const b=document.getElementById('tema-'+t);
-    if(b){b.className='cfg-btn'+(cfg.tema===t?' active':'');b.style.borderColor=cfg.tema===t?'var(--green)':'';}
+    if(b){b.className='cfg-btn'+(cfg.tema===t?' active':'');}
   });
+  // tamanho texto
   ['sm','md','lg'].forEach(s=>{
     const b=document.getElementById('size-'+s);
-    if(b){b.className='cfg-btn'+(cfg.size===s?' active':'');b.style.borderColor=cfg.size===s?'var(--green)':'';}
+    if(b)b.className='cfg-btn'+(cfg.size===s?' active':'');
   });
+  // tamanho título
   ['sm','md','lg','xl'].forEach(s=>{
     const b=document.getElementById('tsize-'+s);
-    if(b){b.className='cfg-btn'+(cfg.tituloSize===s?' active':'');b.style.borderColor=cfg.tituloSize===s?'var(--green)':'';}
+    if(b)b.className='cfg-btn'+(cfg.tituloSize===s?' active':'');
   });
-  // emojis
-  document.querySelectorAll('.emoji-opt').forEach(el=>{
-    el.style.borderColor=el.textContent===cfg.tituloEmoji?'var(--green)':'transparent';
-    el.style.background=el.textContent===cfg.tituloEmoji?'var(--green-bg)':'';
+  // card style
+  ['default','flat','shadow','border'].forEach(s=>{
+    const b=document.getElementById('card-'+s);
+    if(b)b.className='cfg-btn'+(cfg.cardStyle===s?' active':'');
   });
-  // cores
+  // radius
+  ['sharp','soft','round'].forEach(r=>{
+    const b=document.getElementById('radius-'+r);
+    if(b)b.className='cfg-btn'+(cfg.radius===r?' active':'');
+  });
+
+  // emoji grid
+  const eg=document.getElementById('emojiGrid');
+  if(eg){
+    eg.innerHTML='';
+    EMOJIS.forEach(e=>{
+      const s=document.createElement('span');
+      s.textContent=e;
+      const sel=e===cfg.tituloEmoji;
+      s.style.cssText=`font-size:24px;cursor:pointer;padding:6px 8px;border-radius:8px;display:inline-block;transition:.15s;border:2px solid ${sel?'var(--green)':'transparent'};background:${sel?'var(--green-bg)':''}`;
+      s.onclick=()=>setEmoji(e);
+      eg.appendChild(s);
+    });
+  }
+
+  // cores predefinidas
   const container=document.getElementById('corOptions');
   if(container){
-    container.innerHTML=CORES.map(c=>`
-      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer" onclick="setCor('${c.id}')">
-        <div style="width:30px;height:30px;border-radius:50%;background:${c.accent};border:${cfg.cor===c.id?'3px solid var(--text)':'3px solid transparent'};transition:.15s;transform:${cfg.cor===c.id?'scale(1.15)':'scale(1)'}"></div>
-        <span style="font-size:10px;color:var(--text2)">${c.label}</span>
-      </div>`).join('');
+    container.innerHTML='';
+    CORES.forEach(c=>{
+      const div=document.createElement('div');
+      div.style.cssText='display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer';
+      div.onclick=()=>setCor(c.id);
+      const sel=cfg.cor===c.id&&!cfg.corCustom;
+      const dot=document.createElement('div');
+      dot.style.cssText=`width:32px;height:32px;border-radius:50%;background:${c.accent};border:3px solid ${sel?'var(--text)':'transparent'};transition:.2s;transform:${sel?'scale(1.15)':'scale(1)'}`;
+      const lbl=document.createElement('span');
+      lbl.textContent=c.label;lbl.style.cssText='font-size:10px;color:var(--text2);font-weight:500';
+      div.appendChild(dot);div.appendChild(lbl);container.appendChild(div);
+    });
   }
+
+  // color picker cor destaque
+  const cc=document.getElementById('corCustom');
+  if(cc&&cfg.corCustom)cc.value=cfg.corCustom;
+  const ch=document.getElementById('corCustomHex');
+  if(ch)ch.textContent=cfg.corCustom||'';
+
+  // fundo predefinido
+  const bgC=document.getElementById('bgOptions');
+  if(bgC){
+    bgC.innerHTML='';
+    BG_PRESETS.forEach(b=>{
+      const isDark=cfg.tema==='dark'||(cfg.tema==='auto'&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+      const color=isDark?b.dark:b.light;
+      const div=document.createElement('div');
+      div.style.cssText='display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer';
+      div.onclick=()=>setBgPreset(b.id);
+      const sel=cfg.bgPreset===b.id&&!cfg.bgCustom;
+      const dot=document.createElement('div');
+      dot.style.cssText=`width:32px;height:32px;border-radius:8px;background:${color};border:3px solid ${sel?'var(--green)':'var(--border)'};transition:.2s`;
+      const lbl=document.createElement('span');
+      lbl.textContent=b.label;lbl.style.cssText='font-size:10px;color:var(--text2);font-weight:500';
+      div.appendChild(dot);div.appendChild(lbl);bgC.appendChild(div);
+    });
+  }
+
+  // color picker fundo
+  const bc=document.getElementById('bgCustom');
+  if(bc&&cfg.bgCustom)bc.value=cfg.bgCustom;
+
   // preview título
   const pe=document.getElementById('prevEmoji');
   const pt=document.getElementById('prevTitulo');
   if(pe)pe.textContent=cfg.tituloEmoji;
   if(pt)pt.textContent=cfg.tituloTexto;
-}
+}}
+
 
 
 // EXPORTAR / IMPORTAR

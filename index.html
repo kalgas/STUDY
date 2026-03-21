@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KALIL</title>
+<title>Concursos Pro</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -150,7 +150,7 @@ input:focus,select:focus{border-color:var(--green)}
 <div class="app">
   <div class="header">
     <div>
-      <div class="header-title">KALGAS</div>
+      <div class="header-title">📚 Concursos Pro</div>
       <div class="header-sub" id="streakLabel">🔥 0 dias de streak</div>
     </div>
     <div class="spacer"></div>
@@ -982,6 +982,38 @@ let pomoInterval=null,pomoRunning=false,pomoSeconds=0,pomoMode='focus',pomoSessH
 function getFoco(){return(parseInt(document.getElementById('pomoFocoSet').value)||25)*60}
 function getBreak(){return(parseInt(document.getElementById('pomoBreakSet').value)||5)*60}
 function pomoFmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+// ==================== ALERTA POMODORO ====================
+function playAlert(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    // toca 3 bips
+    [0,0.35,0.7].forEach(t=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.frequency.value=880;
+      osc.type='sine';
+      gain.gain.setValueAtTime(0,ctx.currentTime+t);
+      gain.gain.linearRampToValueAtTime(0.4,ctx.currentTime+t+0.05);
+      gain.gain.linearRampToValueAtTime(0,ctx.currentTime+t+0.25);
+      osc.start(ctx.currentTime+t);
+      osc.stop(ctx.currentTime+t+0.3);
+    });
+  }catch(e){}
+}
+function showToast(msg){
+  let el=document.getElementById('pomoToast');
+  if(!el){el=document.createElement('div');el.id='pomoToast';el.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .4s';document.body.appendChild(el);}
+  el.textContent=msg;el.style.opacity='1';
+  clearTimeout(el._t);el._t=setTimeout(()=>{el.style.opacity='0';},4000);
+}
+function sendNotification(title,body){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='granted'){new Notification(title,{body,icon:'',silent:false});}
+  else if(Notification.permission!=='denied'){Notification.requestPermission().then(p=>{if(p==='granted')new Notification(title,{body});});}
+}
+function pomoAlert(msg){playAlert();showToast(msg);sendNotification('Concursos Pro',msg);}
+
 function switchPomo(tab,btn){
   document.querySelectorAll('.pomo-tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.pomo-panel').forEach(p=>p.classList.remove('active'));
@@ -1002,8 +1034,18 @@ function togglePomo(){
       }
       if(pomoSeconds<=0){
         clearInterval(pomoInterval);pomoRunning=false;
-        if(pomoMode==='focus'){pomoSessHoje++;document.getElementById('pomoSessions').textContent=pomoSessHoje;pomoMode='break';pomoSeconds=getBreak();document.getElementById('pomoLabel').textContent='☕ Pausa';document.getElementById('pomoBtn').textContent='▶ Iniciar';}
-        else{pomoMode='focus';pomoSeconds=getFoco();document.getElementById('pomoLabel').textContent='🎯 Foco';document.getElementById('pomoBtn').textContent='▶ Iniciar';}
+        if(pomoMode==='focus'){
+          pomoSessHoje++;document.getElementById('pomoSessions').textContent=pomoSessHoje;
+          pomoMode='break';pomoSeconds=getBreak();
+          document.getElementById('pomoLabel').textContent='☕ Pausa';
+          document.getElementById('pomoBtn').textContent='▶ Iniciar';
+          pomoAlert('✅ Foco concluído! Hora de descansar ☕');
+        }else{
+          pomoMode='focus';pomoSeconds=getFoco();
+          document.getElementById('pomoLabel').textContent='🎯 Foco';
+          document.getElementById('pomoBtn').textContent='▶ Iniciar';
+          pomoAlert('🎯 Pausa acabou! Bora focar!');
+        }
         document.getElementById('pomoTime').textContent=pomoFmt(pomoSeconds);
       }
     },1000);
@@ -1093,6 +1135,7 @@ const dn=['domingo','segunda','terça','quarta','quinta','sexta','sábado'],nd=n
 document.getElementById('dateLabel').textContent=dn[nd.getDay()]+', '+nd.toLocaleDateString('pt-BR');
 loadData();resetPomo();
 document.getElementById('pomoMinutes').textContent=data.pomMinutes[todayStr()]||0;
+if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
 renderAll();
 </script>
 </body>

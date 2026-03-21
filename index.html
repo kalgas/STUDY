@@ -212,6 +212,14 @@ input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,
 
   <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
+    <div style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;margin-bottom:12px;font-size:12px;color:var(--text2)">
+      <span>💾</span>
+      <span>Seus dados ficam salvos neste navegador.</span>
+      <div class="spacer"></div>
+      <button class="btn sm primary" onclick="exportarDados()" style="white-space:nowrap">Exportar backup</button>
+      <button class="btn sm" onclick="document.getElementById('importFileDash').click()" style="white-space:nowrap">Importar</button>
+      <input type="file" id="importFileDash" accept=".json" style="display:none" onchange="importarDados(event)">
+    </div>
     <div class="frase-card">
       <button class="frase-btn" onclick="novaFrase()">🔄</button>
       <div class="frase-text" id="fraseText"></div>
@@ -562,13 +570,28 @@ function renderFrase(){
 
 function emptyData(){return{materias:[],metas:[],edital:[],streak:{count:0,lastDate:''},sessions:{},pomMinutes:{},cronoTotal:0};}
 let data=emptyData();
-function save(){localStorage.setItem('cp_data',JSON.stringify(data));}
+function save(){
+  localStorage.setItem('cp_data',JSON.stringify(data));
+  localStorage.setItem('cp_bk',JSON.stringify(data));
+}
 function loadData(){
   try{
-    const d=JSON.parse(localStorage.getItem('cp_data'));
-    if(d){data=Object.assign(emptyData(),d);}
-    else{data.edital=EDITAL_PADRAO.map(e=>({...e,done:false,subAssuntos:[]}));save();}
-  }catch(e){data.edital=EDITAL_PADRAO.map(e=>({...e,done:false,subAssuntos:[]}));save();}
+    // tenta todas as chaves possíveis
+    const raw=localStorage.getItem('cp_data')||localStorage.getItem('cp_bk')||localStorage.getItem('cp_backup');
+    if(raw){
+      const d=JSON.parse(raw);
+      data=Object.assign(emptyData(),d);
+    }
+    // garante que o edital padrão sempre existe se estiver vazio
+    if(!data.edital||data.edital.length===0){
+      data.edital=EDITAL_PADRAO.map(e=>({...e,done:false,subAssuntos:[]}));
+    }
+    save();
+  }catch(e){
+    data=emptyData();
+    data.edital=EDITAL_PADRAO.map(e=>({...e,done:false,subAssuntos:[]}));
+    save();
+  }
 }
 
 function todayStr(){return new Date().toISOString().slice(0,10)}

@@ -908,10 +908,73 @@ function toggleAddSub(id){
   el.style.display=open?'flex':'none';
   if(open)el.querySelector('input').focus();
 }
+function cycleTopico(mi,ti){
+  const t=data.materias[mi].topicos[ti];
+  if(t.temRevisao===false){
+    // 📂 → 🌱
+    t.temRevisao=true;t.pendente=true;
+  } else if(t.pendente===true){
+    // ⏳ → 📂
+    t.temRevisao=false;t.pendente=false;
+  } else {
+    // 🌱 → ⏳
+    t.pendente=true;
+  }
+  save();renderMaterias();
+}
 function togglePendente(mi,ti){
   const t=data.materias[mi].topicos[ti];
   t.pendente=!t.pendente;
   save();renderMaterias();
+}
+// cicla: 🌱 (revisável) → ⏳ (pendente) → 📂 (agrupador) → 🌱
+function cycleSubEstado(mi,ti,si,s2i,s3i,nivel){
+  // suporte a chamadas com menos args
+  if(typeof s2i==='string'){nivel=s2i;s2i=undefined;s3i=undefined;}
+  else if(typeof s3i==='string'){nivel=s3i;s3i=undefined;}
+  let s;
+  if(nivel==='3') s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i].filhos[s3i];
+  else if(nivel==='2') s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i];
+  else s=data.materias[mi].topicos[ti].subAssuntos[si];
+  // ciclo: revisável(🌱) → pendente(⏳) → agrupador(📂) → revisável(🌱)
+  if(s.agrupador){s.agrupador=false;s.pendente=false;}        // 📂 → 🌱
+  else if(s.pendente){s.pendente=false;s.agrupador=true;}     // ⏳ → 📂
+  else{s.pendente=true;}                                       // 🌱 → ⏳
+  save();renderMaterias();
+}
+function toggleAgrupSub(mi,ti,si){
+  const s=data.materias[mi].topicos[ti].subAssuntos[si];
+  s.agrupador=!s.agrupador;if(s.agrupador)s.pendente=false;save();renderMaterias();
+}
+function toggleAgrupSub2(mi,ti,si,s2i){
+  const s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i];
+  s.agrupador=!s.agrupador;
+  if(s.agrupador)s.pendente=false;
+  save();renderMaterias();
+}
+function toggleAgrupSub3(mi,ti,si,s2i,s3i){
+  const s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i].filhos[s3i];
+  s.agrupador=!s.agrupador;
+  if(s.agrupador)s.pendente=false;
+  save();renderMaterias();
+}
+function togglePendenteSub2(mi,ti,si,s2i){
+  const s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i];
+  s.pendente=!s.pendente;save();renderMaterias();
+}
+let curRevSub2={};
+function openRevSub2Modal(mi,ti,si,s2i){
+  curRevSub2={mi,ti,si,s2i};
+  const s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i];
+  const isPend=s.pendente===true;
+  document.getElementById('revSubInfo').textContent=s.texto+(isPend?'':' · Intervalo: '+(s.intervalAtual||1)+'d');
+  document.getElementById('revSubPendenteAviso').style.display=isPend?'block':'none';
+  document.getElementById('btnSalvarRevSub').textContent=isPend?'⏳♻️ Salvar':'♻️ Salvar';
+  document.getElementById('revSubQtdQ').value=0;
+  document.getElementById('revSubAcertosQ').value=0;
+  document.getElementById('revSubPctPreview').textContent='Porcentagem: —';
+  document.getElementById('modalRevSub').dataset.nivel='2';
+  document.getElementById('modalRevSub').classList.add('open');
 }
 function togglePendenteSub(mi,ti,si){
   const s=data.materias[mi].topicos[ti].subAssuntos[si];
@@ -983,8 +1046,9 @@ function openRevSub3Modal(mi,ti,si,s2i,s3i){
   document.getElementById('revSubQtdQ').value=0;
   document.getElementById('revSubAcertosQ').value=0;
   document.getElementById('revSubPctPreview').textContent='Porcentagem: —';
+  document.getElementById('modalRevSub').dataset.nivel='3';
   document.getElementById('modalRevSub').classList.add('open');
-  curRevSubMat=null; // sinaliza que é nível 3
+  curRevSubMat=null;
 }
 function addSubAssunto(mi,ti){
   const inp=document.getElementById(`sub_inp_${mi}_${ti}`);
@@ -1019,25 +1083,25 @@ function openRevSubModal(mi,ti,si){
   document.getElementById('revSubQtdQ').value=0;
   document.getElementById('revSubAcertosQ').value=0;
   document.getElementById('revSubPctPreview').textContent='Porcentagem: —';
+  document.getElementById('modalRevSub').dataset.nivel='1';
   document.getElementById('modalRevSub').classList.add('open');
 }
 function saveRevSub(){
   const qtdQ=parseInt(document.getElementById('revSubQtdQ').value)||0;
   const acertosQ=parseInt(document.getElementById('revSubAcertosQ').value)||0;
   if(qtdQ===0){showToast('⏳ Preencha o total de questões para agendar a revisão!');return;}
-  // nível 3
-  if(curRevSubMat===null){
-    const {mi,ti,si,s2i,s3i}=curRevSub3;
-    const s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i].filhos[s3i];
-    const acertos=Math.round(acertosQ/qtdQ*100);
-    const rev=nextRevDate(acertos,s.intervalAtual||1);
-    s.acertos=acertos;s.qtdQ=(s.qtdQ||0)+qtdQ;s.acertosQ=(s.acertosQ||0)+acertosQ;
-    s.proximaRevisao=rev.date;s.intervalAtual=rev.dias;s.revisoes=(s.revisoes||1)+1;s.dataEstudo=todayStr();s.pendente=false;
-    updateStreak();save();closeModal();renderMaterias();return;
-  }
-  // nível 1
-  const s=data.materias[curRevSubMat].topicos[curRevSubTop].subAssuntos[curRevSubSub];
+  const nivel=document.getElementById('modalRevSub').dataset.nivel||'1';
   const acertos=Math.round(acertosQ/qtdQ*100);
+  let s;
+  if(nivel==='3'){
+    const {mi,ti,si,s2i,s3i}=curRevSub3;
+    s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i].filhos[s3i];
+  } else if(nivel==='2'){
+    const {mi,ti,si,s2i}=curRevSub2;
+    s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i];
+  } else {
+    s=data.materias[curRevSubMat].topicos[curRevSubTop].subAssuntos[curRevSubSub];
+  }
   const rev=nextRevDate(acertos,s.intervalAtual||1);
   s.acertos=acertos;s.qtdQ=(s.qtdQ||0)+qtdQ;s.acertosQ=(s.acertosQ||0)+acertosQ;
   s.proximaRevisao=rev.date;s.intervalAtual=rev.dias;
@@ -1069,6 +1133,7 @@ function renderMaterias(){
         const subOpen=subPanelOpen[subKey]!==false;
         const isPendente=temRev&&t.pendente===true;
         const agrupEmoji=t.agrupEmoji||'📂';
+        const topicoIcon=!temRev?'📂':isPendente?'⏳':'🌱';
         return`<div class="item">
           <div class="flex">${temRev?dominioRing(t):`<span style="width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;cursor:pointer" onclick="cycleAgrupEmoji(${mi},${ti})" title="Clique para trocar emoji">${agrupEmoji}</span>`}<div style="flex:1;min-width:0">
             <div class="flex" style="flex-wrap:wrap;gap:4px">
@@ -1076,7 +1141,7 @@ function renderMaterias(){
               ${temRev?metodoBadge(t.metodo||'nova'):''} ${temRev?recursosTags(t):''}
               <div class="spacer"></div>
               ${temRev?dominioBadge(t)+' ':''} ${temRev&&!isPendente?intBadge(t.intervalAtual||1):''}
-              ${temRev?`<span style="cursor:pointer;font-size:14px" onclick="togglePendente(${mi},${ti})" title="${isPendente?'Desmarcar pendente':'Marcar como pendente'}">${isPendente?'⏳':'🌱'}</span>`:''}
+              <span style="cursor:pointer;font-size:14px" onclick="cycleTopico(${mi},${ti})" title="🌱 revisável → ⏳ pendente → 📂 agrupador">${topicoIcon}</span>
               <button class="btn sm" onclick="toggleSubPanel('${subKey}')" style="background:none;border:1px solid var(--border);border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:11px;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;line-height:1">${subOpen?'−':'+'}</button>
               ${temRev?`<button class="btn sm" onclick="openRevModal(${mi},${ti})">Revisar</button>`:''}
               <button class="btn sm danger" onclick="deleteTopico(${mi},${ti})">✕</button>
@@ -1088,18 +1153,19 @@ function renderMaterias(){
             ${subs.map((s,si)=>{
               const sRev=s.proximaRevisao?daysDiff(s.proximaRevisao):null;
               const isPend1=s.pendente===true;
+              const isAgrup1=s.agrupador===true;
               const subs2=s.filhos||[];
               const s2Key=`${mi}_${ti}_${si}`;
               const s2Open=subPanelOpen[s2Key]===true;
-              const badge1=!subs2.length&&!isPend1&&sRev!==null?(sRev<=0?`<span class="sub-rev-badge" style="background:var(--red-bg);color:var(--red-txt)">Hoje</span>`:`<span class="sub-rev-badge" style="background:var(--blue-bg);color:var(--blue-txt)">${sRev}d</span>`):'';
-              return`<div>
+              const badge1=!isAgrup1&&!isPend1&&sRev!==null?(sRev<=0?`<span class="sub-rev-badge" style="background:var(--red-bg);color:var(--red-txt)">Hoje</span>`:`<span class="sub-rev-badge" style="background:var(--blue-bg);color:var(--blue-txt)">${sRev}d</span>`):'';
+              const icon1=isAgrup1?'📂':isPend1?'⏳':'🌱';              return`<div>
                 <div class="sub-assunto-item">
                   <div class="checkbox ${s.done?'done':''}" style="width:15px;height:15px;font-size:9px" onclick="toggleSubAssunto(${mi},${ti},${si})">${s.done?'✓':''}</div>
                   <span id="sub_txt_${mi}_${ti}_${si}" class="sub-assunto-text editavel" style="${s.done?'text-decoration:line-through;color:var(--text3)':''}" onclick="editSubAssunto(${mi},${ti},${si})">${s.texto}</span>
                   ${badge1}
-                  ${!subs2.length?`<span style="cursor:pointer;font-size:12px;opacity:.7" onclick="togglePendenteSub(${mi},${ti},${si})">${isPend1?'⏳':'🌱'}</span>`:''}
-                  ${!subs2.length?`<button class="btn sm" style="padding:2px 5px;background:var(--green-bg);color:var(--green-txt);border-color:var(--green-bg)" onclick="openRevSubModal(${mi},${ti},${si})">Rev</button>`:''}
-                  <button onclick="toggleSubPanel2('${s2Key}')" style="background:none;border:1px solid var(--border);border-radius:50%;width:16px;height:16px;cursor:pointer;font-size:9px;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;${!subs2.length?'opacity:.4':''}">${s2Open?'−':'+'}</button>
+                  <span style="cursor:pointer;font-size:13px" onclick="cycleSubEstado(${mi},${ti},${si},'1')" title="🌱 revisável → ⏳ pendente → 📂 agrupador">${icon1}</span>
+                  ${!isAgrup1?`<button class="btn sm" style="padding:2px 5px;background:var(--green-bg);color:var(--green-txt);border-color:var(--green-bg)" onclick="openRevSubModal(${mi},${ti},${si})">Rev</button>`:''}
+                  <button onclick="toggleSubPanel2('${s2Key}')" style="background:none;border:1px solid var(--border);border-radius:50%;width:16px;height:16px;cursor:pointer;font-size:9px;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0">${s2Open?'−':'+'}</button>
                   <button onclick="openAddFilho(${mi},${ti},${si})" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--text3);padding:0 2px" title="Adicionar sub-nível">›+</button>
                   <button class="btn sm" onclick="deleteSubAssunto(${mi},${ti},${si})" style="color:var(--text2);padding:2px 5px">✕</button>
                 </div>
@@ -1111,7 +1177,9 @@ function renderMaterias(){
                     <div class="sub-assunto-item">
                       <div class="checkbox ${s2.done?'done':''}" style="width:13px;height:13px;font-size:8px" onclick="toggleSub2(${mi},${ti},${si},${s2i})">${s2.done?'✓':''}</div>
                       <span id="s2_${mi}_${ti}_${si}_${s2i}" class="sub-assunto-text editavel" style="font-size:11px;${s2.done?'text-decoration:line-through;color:var(--text3)':''}" onclick="editSub2(${mi},${ti},${si},${s2i})">${s2.texto}</span>
-                      ${s2Subs.length?`<button onclick="toggleSubPanel2('${s3Key}')" style="background:none;border:1px solid var(--border);border-radius:50%;width:14px;height:14px;cursor:pointer;font-size:8px;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0">${s3Open?'−':'+'}</button>`:''}
+                      ${s2.agrupador!==true?`<button class="btn sm" style="padding:1px 4px;background:var(--green-bg);color:var(--green-txt);border-color:var(--green-bg);font-size:10px" onclick="openRevSub2Modal(${mi},${ti},${si},${s2i})">Rev</button>`:''}
+                      <span style="cursor:pointer;font-size:12px" onclick="cycleSubEstado(${mi},${ti},${si},${s2i},'2')" title="🌱 revisável → ⏳ pendente → 📂 agrupador">${s2.agrupador===true?'📂':s2.pendente===true?'⏳':'🌱'}</span>
+                      <button onclick="toggleSubPanel2('${s3Key}')" style="background:none;border:1px solid var(--border);border-radius:50%;width:14px;height:14px;cursor:pointer;font-size:8px;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0">${s3Open?'−':'+'}</button>
                       <button onclick="openAddFilho2(${mi},${ti},${si},${s2i})" style="background:none;border:none;cursor:pointer;font-size:10px;color:var(--text3);padding:0 2px">›+</button>
                       <button class="btn sm" onclick="deleteSub2(${mi},${ti},${si},${s2i})" style="color:var(--text2);padding:1px 4px;font-size:10px">✕</button>
                     </div>
@@ -1127,9 +1195,9 @@ function renderMaterias(){
                           <div class="checkbox ${s3.done?'done':''}" style="width:12px;height:12px;font-size:7px" onclick="toggleSub3(${mi},${ti},${si},${s2i},${s3i})">${s3.done?'✓':''}</div>
                           <span id="s3_${mi}_${ti}_${si}_${s2i}_${s3i}" class="sub-assunto-text editavel" style="font-size:10px;${s3.done?'text-decoration:line-through;color:var(--text3)':''}" onclick="editSub3(${mi},${ti},${si},${s2i},${s3i})">${s3.texto}</span>
                           ${s3Badge}
-                          ${!s3Subs.length?`<span style="cursor:pointer;font-size:10px;opacity:.7" onclick="togglePendenteSub3(${mi},${ti},${si},${s2i},${s3i})">${s3Pend?'⏳':'🌱'}</span>`:''}
-                          ${!s3Subs.length?`<button class="btn sm" style="padding:1px 4px;background:var(--green-bg);color:var(--green-txt);border-color:var(--green-bg);font-size:10px" onclick="openRevSub3Modal(${mi},${ti},${si},${s2i},${s3i})">Rev</button>`:''}
-                          <button onclick="toggleSubPanel2('${s4Key}')" style="background:none;border:1px solid var(--border);border-radius:50%;width:13px;height:13px;cursor:pointer;font-size:7px;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;${!s3Subs.length?'opacity:.35':''}">${s4Open?'−':'+'}</button>
+                          ${s3.agrupador!==true?`<button class="btn sm" style="padding:1px 4px;background:var(--green-bg);color:var(--green-txt);border-color:var(--green-bg);font-size:10px" onclick="openRevSub3Modal(${mi},${ti},${si},${s2i},${s3i})">Rev</button>`:''}
+                          <span style="cursor:pointer;font-size:11px" onclick="cycleSubEstado(${mi},${ti},${si},${s2i},${s3i},'3')" title="🌱 revisável → ⏳ pendente → 📂 agrupador">${s3.agrupador===true?'📂':s3Pend?'⏳':'🌱'}</span>
+                          <button onclick="toggleSubPanel2('${s4Key}')" style="background:none;border:1px solid var(--border);border-radius:50%;width:13px;height:13px;cursor:pointer;font-size:7px;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0">${s4Open?'−':'+'}</button>
                           <button onclick="openAddFilho3(${mi},${ti},${si},${s2i},${s3i})" style="background:none;border:none;cursor:pointer;font-size:9px;color:var(--text3);padding:0 1px">›+</button>
                           <button class="btn sm" onclick="deleteSub3(${mi},${ti},${si},${s2i},${s3i})" style="color:var(--text2);padding:1px 3px;font-size:9px">✕</button>
                         </div>

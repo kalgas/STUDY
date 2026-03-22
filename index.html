@@ -1019,12 +1019,12 @@ function openRevSub2Modal(mi,ti,si,s2i){
   curRevSub2={mi,ti,si,s2i};
   const s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i];
   const isPend=s.pendente===true;
-  document.getElementById('revSubInfo').textContent=s.texto+(isPend?'':' · Intervalo: '+(s.intervalAtual||1)+'d');
+  document.getElementById('revSubInfo').textContent=s.texto+(isPend?'':' · Intervalo: '+(s.intervalAtual||1)+'d · Acertos: '+(s.acertos||0)+'%');
   document.getElementById('revSubPendenteAviso').style.display=isPend?'block':'none';
   document.getElementById('btnSalvarRevSub').textContent=isPend?'⏳♻️ Salvar':'♻️ Salvar';
-  document.getElementById('revSubQtdQ').value=0;
-  document.getElementById('revSubAcertosQ').value=0;
-  document.getElementById('revSubPctPreview').textContent='Porcentagem: —';
+  document.getElementById('revSubQtdQ').value=s.qtdQ||0;
+  document.getElementById('revSubAcertosQ').value=s.acertosQ||0;
+  document.getElementById('revSubPctPreview').textContent=s.qtdQ?`Porcentagem: ${s.acertos||0}% (${s.acertosQ||0}/${s.qtdQ})`:'Porcentagem: —';
   document.getElementById('modalRevSub').dataset.nivel='2';
   document.getElementById('modalRevSub').classList.add('open');
 }
@@ -1093,12 +1093,12 @@ function openRevSub3Modal(mi,ti,si,s2i,s3i){
   curRevSub3={mi,ti,si,s2i,s3i};
   const s=data.materias[mi].topicos[ti].subAssuntos[si].filhos[s2i].filhos[s3i];
   const isPend=s.pendente===true;
-  document.getElementById('revSubInfo').textContent=s.texto+(isPend?'':' · '+( s.intervalAtual||1)+'d');
+  document.getElementById('revSubInfo').textContent=s.texto+(isPend?'':' · '+(s.intervalAtual||1)+'d · Acertos: '+(s.acertos||0)+'%');
   document.getElementById('revSubPendenteAviso').style.display=isPend?'block':'none';
   document.getElementById('btnSalvarRevSub').textContent=isPend?'⏳♻️ Salvar':'♻️ Salvar';
-  document.getElementById('revSubQtdQ').value=0;
-  document.getElementById('revSubAcertosQ').value=0;
-  document.getElementById('revSubPctPreview').textContent='Porcentagem: —';
+  document.getElementById('revSubQtdQ').value=s.qtdQ||0;
+  document.getElementById('revSubAcertosQ').value=s.acertosQ||0;
+  document.getElementById('revSubPctPreview').textContent=s.qtdQ?`Porcentagem: ${s.acertos||0}% (${s.acertosQ||0}/${s.qtdQ})`:'Porcentagem: —';
   document.getElementById('modalRevSub').dataset.nivel='3';
   document.getElementById('modalRevSub').classList.add('open');
 }
@@ -1133,9 +1133,9 @@ function openRevSubModal(mi,ti,si){
   document.getElementById('revSubInfo').textContent=s.texto+(isPend?'':' · Intervalo atual: '+(s.intervalAtual||1)+'d · Acertos: '+(s.acertos||0)+'%');
   document.getElementById('revSubPendenteAviso').style.display=isPend?'block':'none';
   document.getElementById('btnSalvarRevSub').textContent=isPend?'⏳♻️ Salvar':'♻️ Salvar';
-  document.getElementById('revSubQtdQ').value=0;
-  document.getElementById('revSubAcertosQ').value=0;
-  document.getElementById('revSubPctPreview').textContent='Porcentagem: —';
+  document.getElementById('revSubQtdQ').value=s.qtdQ||0;
+  document.getElementById('revSubAcertosQ').value=s.acertosQ||0;
+  document.getElementById('revSubPctPreview').textContent=s.qtdQ?`Porcentagem: ${s.acertos||0}% (${s.acertosQ||0}/${s.qtdQ})`:'Porcentagem: —';
   document.getElementById('modalRevSub').dataset.nivel='1';
   document.getElementById('modalRevSub').classList.add('open');
 }
@@ -1333,9 +1333,10 @@ function openRevModal(mi,ti){
   document.getElementById('revisaoInfo').textContent=t.nome+' — '+data.materias[mi].nome+(isPend?'':' · Intervalo atual: '+(t.intervalAtual||1)+'d');
   document.getElementById('revisaoPendenteAviso').style.display=isPend?'block':'none';
   document.getElementById('btnSalvarRevisao').textContent=isPend?'⏳♻️ Salvar revisão':'♻️ Salvar revisão';
-  ['revQtdQ','revAcertosQ'].forEach(id=>document.getElementById(id).value=0);
   ['revResVideo','revResQuestoes','revResPdf'].forEach(id=>document.getElementById(id).checked=false);
-  document.getElementById('revPctPreview').textContent='Porcentagem: —';
+  document.getElementById('revQtdQ').value=t.qtdQ||0;
+  document.getElementById('revAcertosQ').value=t.acertosQ||0;
+  document.getElementById('revPctPreview').textContent=t.qtdQ?`Porcentagem: ${t.acertos||0}% (${t.acertosQ||0}/${t.qtdQ})`:'Porcentagem: —';
   document.getElementById('modalRevisao').classList.add('open');
 }
 function saveRevisao(){

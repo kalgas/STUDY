@@ -1397,10 +1397,27 @@ function renderRevisoes(){
     return;
   }
   el.innerHTML=f.map(x=>{
-    if(x.tipo==='topico')return`<div class="card" style="margin-bottom:8px;border-left:3px solid ${x.pendente?'var(--amber-txt)':'transparent'}"><div class="flex">${dominioRing(x.t)}<div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title">${x.t.nome}</span><div class="spacer"></div>${x.pendente?`<span class="sub-rev-badge" style="background:var(--amber-bg);color:var(--amber-txt)">⏳ pendente</span>`:dominioBadge(x.t)+' '+intBadge(x.t.intervalAtual||1)+' '+revBadge(x.t.proximaRevisao)}<button class="btn sm primary" onclick="openRevModal(${x.mi},${x.ti})">Revisar</button></div><div class="item-sub">${x.m.nome}${x.pendente?' · preencha as questões para agendar':' · '+x.t.acertos+'%'}</div></div></div></div>`;
-    if(x.tipo==='sub2')return`<div class="card" style="margin-bottom:8px;border-left:3px solid var(--green)"><div class="flex"><div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title" style="font-size:12px">${x.nome2}</span><div class="spacer"></div>${intBadge(x.s.intervalAtual||1)} ${revBadge(x.s.proximaRevisao)}<button class="btn sm primary" onclick="openRevSub2Modal(${x.mi},${x.ti},${x.si},${x.s2i})">Revisar</button></div><div class="item-sub">${x.m.nome} › ${x.path}</div></div></div></div>`;
-    if(x.tipo==='sub3')return`<div class="card" style="margin-bottom:8px;border-left:3px solid var(--green)"><div class="flex"><div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title" style="font-size:12px">${x.nome3}</span><div class="spacer"></div>${intBadge(x.s.intervalAtual||1)} ${revBadge(x.s.proximaRevisao)}<button class="btn sm primary" onclick="openRevSub3Modal(${x.mi},${x.ti},${x.si},${x.s2i},${x.s3i})">Revisar</button></div><div class="item-sub">${x.m.nome} › ${x.path}</div></div></div></div>`;
-    return`<div class="card" style="margin-bottom:8px;border-left:3px solid ${x.pendente?'var(--amber-txt)':'var(--green)'}"><div class="flex"><div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title" style="font-size:12px">${x.s.texto}</span><div class="spacer"></div>${x.pendente?`<span class="sub-rev-badge" style="background:var(--amber-bg);color:var(--amber-txt)">⏳ pendente</span>`:intBadge(x.s.intervalAtual||1)+' '+revBadge(x.s.proximaRevisao)}<button class="btn sm primary" onclick="openRevSubModal(${x.mi},${x.ti},${x.si})">Revisar</button></div><div class="item-sub">${x.m.nome} › ${x.t.nome} · ${x.pendente?'preencha as questões para agendar':'sub-assunto · '+x.s.acertos+'%'}</div></div></div></div>`;
+    const cardStyle=`margin-bottom:8px`;
+    const borderColor=x.pendente?'var(--amber-txt)':'var(--green)';
+    const pendBadge=`<span class="sub-rev-badge" style="background:var(--amber-bg);color:var(--amber-txt)">⏳ pendente</span>`;
+
+    if(x.tipo==='topico'){
+      const badges=x.pendente?pendBadge:dominioBadge(x.t)+' '+intBadge(x.t.intervalAtual||1)+' '+revBadge(x.t.proximaRevisao);
+      return`<div class="card" style="${cardStyle};border-left:3px solid ${x.pendente?'var(--amber-txt)':'transparent'}"><div class="flex">${dominioRing(x.t)}<div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title">${x.m.nome}</span><div class="spacer"></div>${badges}<button class="btn sm primary" onclick="openRevModal(${x.mi},${x.ti})">Revisar</button></div><div class="item-sub">${x.t.nome}</div></div></div></div>`;
+    }
+    if(x.tipo==='sub'){
+      const badges=x.pendente?pendBadge:intBadge(x.s.intervalAtual||1)+' '+revBadge(x.s.proximaRevisao);
+      return`<div class="card" style="${cardStyle};border-left:3px solid ${borderColor}"><div class="flex"><div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title" style="font-size:13px">${x.m.nome}</span><div class="spacer"></div>${badges}<button class="btn sm primary" onclick="openRevSubModal(${x.mi},${x.ti},${x.si})">Revisar</button></div><div class="item-sub">${x.t.nome} › ${x.s.texto}</div></div></div></div>`;
+    }
+    if(x.tipo==='sub2'){
+      const badges=intBadge(x.s.intervalAtual||1)+' '+revBadge(x.s.proximaRevisao);
+      return`<div class="card" style="${cardStyle};border-left:3px solid var(--green)"><div class="flex"><div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title" style="font-size:13px">${x.m.nome}</span><div class="spacer"></div>${badges}<button class="btn sm primary" onclick="openRevSub2Modal(${x.mi},${x.ti},${x.si},${x.s2i})">Revisar</button></div><div class="item-sub">${x.path} › ${x.nome2}</div></div></div></div>`;
+    }
+    if(x.tipo==='sub3'){
+      const badges=intBadge(x.s.intervalAtual||1)+' '+revBadge(x.s.proximaRevisao);
+      return`<div class="card" style="${cardStyle};border-left:3px solid var(--green)"><div class="flex"><div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title" style="font-size:13px">${x.m.nome}</span><div class="spacer"></div>${badges}<button class="btn sm primary" onclick="openRevSub3Modal(${x.mi},${x.ti},${x.si},${x.s2i},${x.s3i})">Revisar</button></div><div class="item-sub">${x.path} › ${x.nome3}</div></div></div></div>`;
+    }
+    return'';
   }).join('');
 }
 
@@ -1563,8 +1580,8 @@ function renderDash(){
   const dr=document.getElementById('dashRevisoes');
   if(!revHoje.length){dr.innerHTML='<div class="empty" style="padding:1rem 0">✅ Sem revisões hoje!</div>';}
   else dr.innerHTML=revHoje.slice(0,5).map(x=>{
-    if(x.tipo==='topico')return`<div class="item"><div class="flex">${dominioRing(x.t)}<div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title">${x.t.nome}</span><div class="spacer"></div>${revBadge(x.t.proximaRevisao)}<button class="btn sm primary" onclick="openRevModal(${x.mi},${x.ti})">Revisar</button></div><div class="item-sub">${x.m.nome} ${dominioBadge(x.t)}</div></div></div></div>`;
-    return`<div class="item"><div class="flex"><div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title" style="font-size:12px">📌 ${x.s.texto}</span><div class="spacer"></div>${revBadge(x.s.proximaRevisao)}<button class="btn sm primary" onclick="openRevSubModal(${x.mi},${x.ti},${x.si})">Revisar</button></div><div class="item-sub">${x.m.nome} › ${x.t.nome}</div></div></div></div>`;
+    if(x.tipo==='topico')return`<div class="item"><div class="flex">${dominioRing(x.t)}<div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title">${x.t.nome}</span><div class="spacer"></div>${revBadge(x.t.proximaRevisao)}<button class="btn sm primary" onclick="openRevModal(${x.mi},${x.ti})">Revisar</button></div><div class="item-sub">${x.m.nome}</div></div></div></div>`;
+    return`<div class="item"><div class="flex"><div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title" style="font-size:13px">${x.s.texto}</span><div class="spacer"></div>${revBadge(x.s.proximaRevisao)}<button class="btn sm primary" onclick="openRevSubModal(${x.mi},${x.ti},${x.si})">Revisar</button></div><div class="item-sub">${x.m.nome} › ${x.t.nome}</div></div></div></div>`;
   }).join('')+(revHoje.length>5?`<div style="text-align:center;padding:6px;font-size:11px;color:var(--text2)">+${revHoje.length-5} mais</div>`:'');
   const dm=document.getElementById('dashMetas');
   if(!metasHoje.length){dm.innerHTML='<div class="empty" style="padding:1rem 0">Nenhuma meta hoje</div>';}

@@ -207,7 +207,6 @@ input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,
     <button onclick="showPage('materias',this)">Matérias</button>
     <button onclick="showPage('revisoes',this)">Revisões</button>
     <button onclick="showPage('edital',this)">Edital</button>
-    <button onclick="showPage('metas',this)">Metas</button>
     <button onclick="showPage('pomodoro',this)">Pomodoro</button>
     <button onclick="showPage('stats',this)">Estatísticas</button>
     <button onclick="showPage('simulados',this)">Simulados</button>
@@ -223,7 +222,20 @@ input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,
     <div class="grid4" id="dashMetrics"></div>
     <div class="grid2" style="margin-bottom:12px">
       <div class="card"><h2>Revisões de hoje</h2><div id="dashRevisoes"></div></div>
-      <div class="card"><h2>Metas do dia</h2><div id="dashMetas"></div></div>
+      <div class="card">
+        <div class="flex" style="margin-bottom:8px">
+          <h2 style="margin:0">Metas do dia</h2>
+          <div class="spacer"></div>
+          <button onclick="toggleAddMeta()" style="background:none;border:1px solid var(--border);border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:16px;color:var(--text2);display:flex;align-items:center;justify-content:center;padding:0;line-height:1;transition:.2s" title="Adicionar meta" id="btnAddMeta">+</button>
+        </div>
+        <div id="addMetaWrap" style="display:none;margin-bottom:8px">
+          <div style="display:flex;gap:6px">
+            <input type="text" id="novaMetaDash" placeholder="Nova meta para hoje..." style="margin:0;flex:1;font-size:12px;padding:6px 10px" onkeydown="if(event.key==='Enter')addMetaDash()">
+            <button class="btn sm primary" onclick="addMetaDash()">+</button>
+          </div>
+        </div>
+        <div id="dashMetas"></div>
+      </div>
     </div>
     <!-- COUNTDOWN -->
     <div id="dashCountdown"></div>
@@ -1525,6 +1537,22 @@ function renderEdital(){
 }
 
 // METAS
+function toggleAddMeta(){
+  const w=document.getElementById('addMetaWrap');
+  const b=document.getElementById('btnAddMeta');
+  if(!w)return;
+  const open=w.style.display==='none';
+  w.style.display=open?'flex':'none';
+  if(b)b.textContent=open?'−':'+';
+  if(open)document.getElementById('novaMetaDash').focus();
+}
+function addMetaDash(){
+  const inp=document.getElementById('novaMetaDash');
+  const v=inp?inp.value.trim():'';
+  if(!v)return;
+  data.metas.push({texto:v,done:false,data:todayStr()});
+  inp.value='';save();renderDash();
+}
 function addMeta(){
   const v=document.getElementById('novaMeta').value.trim();if(!v)return;
   data.metas.push({texto:v,done:false,data:todayStr()});document.getElementById('novaMeta').value='';save();renderMetas();
@@ -1594,11 +1622,11 @@ function renderDash(){
     return`<div class="item"><div class="flex"><div style="flex:1;min-width:0"><div class="flex" style="flex-wrap:wrap;gap:4px"><span class="item-title" style="font-size:13px">${x.s.texto}</span><div class="spacer"></div>${revBadge(x.s.proximaRevisao)}<button class="btn sm primary" onclick="openRevSubModal(${x.mi},${x.ti},${x.si})">Revisar</button></div><div class="item-sub">${x.m.nome} › ${x.t.nome}</div></div></div></div>`;
   }).join('')+(revHoje.length>5?`<div style="text-align:center;padding:6px;font-size:11px;color:var(--text2)">+${revHoje.length-5} mais</div>`:'');
   const dm=document.getElementById('dashMetas');
-  if(!metasHoje.length){dm.innerHTML='<div class="empty" style="padding:1rem 0">Nenhuma meta hoje</div>';}
+  if(!metasHoje.length){dm.innerHTML='<div style="padding:8px 0;font-size:12px;color:var(--text3);text-align:center">Nenhuma meta hoje</div>';}
   else{
     const pct=Math.round(metasDone/metasHoje.length*100);
-    dm.innerHTML=`<div class="flex" style="margin-bottom:5px"><span style="font-size:12px;color:var(--text2)">${metasDone}/${metasHoje.length}</span><div class="spacer"></div><span style="font-size:13px;font-weight:700">${pct}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>`+
-    metasHoje.map(m=>`<div class="item"><div class="flex"><div class="checkbox ${m.done?'done':''}" onclick="toggleMeta(${data.metas.indexOf(m)})">${m.done?'✓':''}</div><span style="font-size:12px;${m.done?'text-decoration:line-through;color:var(--text2)':''}">${m.texto}</span></div></div>`).join('');
+    dm.innerHTML=`<div class="flex" style="margin-bottom:5px"><span style="font-size:11px;color:var(--text2)">${metasDone}/${metasHoje.length}</span><div class="spacer"></div><span style="font-size:12px;font-weight:700;color:var(--green)">${pct}%</span></div><div class="progress-bar" style="margin-bottom:8px"><div class="progress-fill" style="width:${pct}%"></div></div>`+
+    metasHoje.map(m=>{const gi=data.metas.indexOf(m);return`<div class="item" style="padding:6px 0"><div class="flex"><div class="checkbox ${m.done?'done':''}" onclick="toggleMeta(${gi});renderDash()" style="width:17px;height:17px;font-size:10px">${m.done?'✓':''}</div><span style="font-size:12px;flex:1;${m.done?'text-decoration:line-through;color:var(--text2)':''}">${m.texto}</span><button onclick="deleteMeta(${gi});renderDash()" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--text3);padding:0 4px">✕</button></div></div>`;}).join('');
   }
   const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().slice(0,10));}
   const vals=days.map(d=>data.pomMinutes[d]||0);

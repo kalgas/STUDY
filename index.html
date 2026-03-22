@@ -761,12 +761,14 @@ function updateStreak(){
 }
 
 // ==================== DOMÍNIO ====================
+function fmtMins(m){if(m>=60){const h=Math.floor(m/60),min=m%60;return min>0?`${h}h ${min}min`:`${h}h`;}return`${m} min`;}
 function calcDominio(t){
   const rev=t.revisoes||1,ac=t.acertos||0;
   const score=Math.round(ac*0.7+Math.min(rev/5,1)*100*0.3);
   let nivel,emoji,cls;
-  if(ac>=80&&rev>=3){nivel='Forte';emoji='🟢';cls='dominio-forte';}
-  else if(ac>=60||rev>=2){nivel='Médio';emoji='🟡';cls='dominio-medio';}
+  // Forte: ≥70% acertos (revisões ajudam mas não bloqueiam)
+  if(ac>=70&&rev>=2){nivel='Forte';emoji='🟢';cls='dominio-forte';}
+  else if(ac>=70||ac>=50&&rev>=2){nivel='Médio';emoji='🟡';cls='dominio-medio';}
   else{nivel='Fraco';emoji='🔴';cls='dominio-fraco';}
   return{nivel,emoji,cls,score};
 }
@@ -1582,7 +1584,7 @@ function renderDash(){
   document.getElementById('dashMetrics').innerHTML=`
     <div class="metric"><span class="val">${revHoje.length}</span><span class="lbl">Revisões hoje</span></div>
     <div class="metric"><span class="val">${metasDone}/${metasHoje.length||0}</span><span class="lbl">Metas do dia</span></div>
-    <div class="metric"><span class="val">${pomMin}</span><span class="lbl">Min. estudados</span></div>
+    <div class="metric"><span class="val">${fmtMins(pomMin)}</span><span class="lbl">Estudados</span></div>
     <div class="metric"><span class="val">${editalDone}/${data.edital.length}</span><span class="lbl">Edital</span></div>`;
   const dr=document.getElementById('dashRevisoes');
   if(!revHoje.length){dr.innerHTML='<div class="empty" style="padding:1rem 0">✅ Sem revisões hoje!</div>';}
@@ -1681,7 +1683,7 @@ function renderStats(){
   const hEl=document.getElementById('statsHistorico');
   const keys=Object.keys(data.sessions).sort().reverse().slice(0,14);
   if(!keys.length){hEl.innerHTML='<div class="empty">Sem histórico ainda</div>';return;}
-  hEl.innerHTML=keys.map(d=>{const s=data.sessions[d],pm=data.pomMinutes[d]||0;return`<div class="item"><div class="flex"><span class="item-title">${fmtDate(d)}</span><div class="spacer"></div><span class="tag">${pm} min</span><span class="tag" style="margin-left:4px">${s.revisoes||0} revisões</span></div></div>`;}).join('');
+  hEl.innerHTML=keys.map(d=>{const s=data.sessions[d],pm=data.pomMinutes[d]||0;return`<div class="item"><div class="flex"><span class="item-title">${fmtDate(d)}</span><div class="spacer"></div><span class="tag">${fmtMins(pm)}</span><span class="tag" style="margin-left:4px">${s.revisoes||0} revisões</span></div></div>`;}).join('');
 }
 
 // ==================== POMODORO ====================
@@ -1725,12 +1727,25 @@ function renderPomodoro(){
   const sel=document.getElementById('pomoMateria');
   if(!sel)return;
   const cur=sel.value;
-  sel.innerHTML='<option value="">— Selecione uma matéria —</option>';
+  sel.innerHTML='<option value="">— Selecione —</option>';
   data.materias.forEach(m=>{
-    const opt=document.createElement('option');
-    opt.value=m.nome;opt.textContent=m.nome;
-    if(m.nome===cur)opt.selected=true;
-    sel.appendChild(opt);
+    // matéria como grupo
+    const grp=document.createElement('optgroup');
+    grp.label=m.nome;
+    // opção da matéria em si
+    const optM=document.createElement('option');
+    optM.value=m.nome;optM.textContent=m.nome;
+    if(m.nome===cur)optM.selected=true;
+    grp.appendChild(optM);
+    // tópicos como sub-opções
+    m.topicos.forEach(t=>{
+      const opt=document.createElement('option');
+      const val=`${m.nome} › ${t.nome}`;
+      opt.value=val;opt.textContent=`  ${t.nome}`;
+      if(val===cur)opt.selected=true;
+      grp.appendChild(opt);
+    });
+    sel.appendChild(grp);
   });
 }
 function getPomMateria(){
@@ -1762,7 +1777,7 @@ function togglePomo(){
       if(pomoMode==='focus'){
         const min=Math.floor((getFoco()-pomoSeconds)/60),today=todayStr();
         const cur=data.pomMinutes[today]||0;if(min>cur){data.pomMinutes[today]=min;save();}
-        document.getElementById('pomoMinutes').textContent=data.pomMinutes[today]||0;
+        document.getElementById('pomoMinutes').textContent=fmtMins(data.pomMinutes[today]||0);
       }
       if(pomoSeconds<=0){
         clearInterval(pomoInterval);pomoRunning=false;
@@ -1822,7 +1837,7 @@ function toggleCrono(){
         if(!data.pomMinutes[today])data.pomMinutes[today]=0;
         data.pomMinutes[today]=Math.max(data.pomMinutes[today],mins);
         save();
-        document.getElementById('pomoMinutes').textContent=data.pomMinutes[today]||0;
+        document.getElementById('pomoMinutes').textContent=fmtMins(data.pomMinutes[today]||0);
       }
       updateCronoTotal();
     },1000);
@@ -2341,7 +2356,7 @@ function renderSimulados(){
 const dn=['domingo','segunda','terça','quarta','quinta','sexta','sábado'],nd=new Date();
 document.getElementById('dateLabel').textContent=dn[nd.getDay()]+', '+nd.toLocaleDateString('pt-BR');
 loadData();resetPomo();
-document.getElementById('pomoMinutes').textContent=data.pomMinutes[todayStr()]||0;
+document.getElementById('pomoMinutes').textContent=fmtMins(data.pomMinutes[todayStr()]||0);
 if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
 renderAll();
 </script>

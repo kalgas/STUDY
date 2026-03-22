@@ -1729,23 +1729,25 @@ function renderPomodoro(){
   const cur=sel.value;
   sel.innerHTML='<option value="">— Selecione —</option>';
   data.materias.forEach(m=>{
-    // matéria como grupo
-    const grp=document.createElement('optgroup');
-    grp.label=m.nome;
-    // opção da matéria em si
-    const optM=document.createElement('option');
-    optM.value=m.nome;optM.textContent=m.nome;
-    if(m.nome===cur)optM.selected=true;
-    grp.appendChild(optM);
-    // tópicos como sub-opções
-    m.topicos.forEach(t=>{
+    if(m.topicos.length===0){
+      // sem tópicos: mostra só a matéria
       const opt=document.createElement('option');
-      const val=`${m.nome} › ${t.nome}`;
-      opt.value=val;opt.textContent=`  ${t.nome}`;
-      if(val===cur)opt.selected=true;
-      grp.appendChild(opt);
-    });
-    sel.appendChild(grp);
+      opt.value=m.nome;opt.textContent=m.nome;
+      if(m.nome===cur)opt.selected=true;
+      sel.appendChild(opt);
+    } else {
+      // com tópicos: grupo com nome da matéria, opções são os tópicos
+      const grp=document.createElement('optgroup');
+      grp.label=m.nome;
+      m.topicos.forEach(t=>{
+        const opt=document.createElement('option');
+        const val=`${m.nome} › ${t.nome}`;
+        opt.value=val;opt.textContent=t.nome;
+        if(val===cur)opt.selected=true;
+        grp.appendChild(opt);
+      });
+      sel.appendChild(grp);
+    }
   });
 }
 function getPomMateria(){

@@ -287,6 +287,14 @@ input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,
         <button class="pomo-tab" onclick="switchPomo('crono',this)">🕐 Cronômetro</button>
       </div>
 
+      <!-- SELETOR DE MATÉRIA -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Estudando agora</div>
+        <select id="pomoMateria" style="margin:0;font-size:13px" onchange="saveCfg()">
+          <option value="">— Selecione uma matéria —</option>
+        </select>
+      </div>
+
       <!-- POMODORO TIMER -->
       <div class="pomo-panel active" id="panel-timer">
         <div class="pomo-settings">
@@ -1091,7 +1099,6 @@ function openRevSub3Modal(mi,ti,si,s2i,s3i){
   document.getElementById('revSubPctPreview').textContent='Porcentagem: —';
   document.getElementById('modalRevSub').dataset.nivel='3';
   document.getElementById('modalRevSub').classList.add('open');
-  curRevSubMat=null;
 }
 function addSubAssunto(mi,ti){
   const inp=document.getElementById(`sub_inp_${mi}_${ti}`);
@@ -1652,8 +1659,18 @@ function renderStats(){
     if(!m.topicos.length)return`<div class="item"><span class="item-title">${m.nome}</span> <span style="font-size:11px;color:var(--text2)">— sem tópicos</span></div>`;
     const dm=dominioMateria(m);
     const avgAc=Math.round(m.topicos.reduce((a,t)=>a+t.acertos,0)/m.topicos.length);
-    const totalQ=m.topicos.reduce((a,t)=>a+(t.qtdQ||0),0);
-    const totalC=m.topicos.reduce((a,t)=>a+(t.acertosQ||0),0);
+    // conta questões de tópicos + todos os sub-níveis
+    let totalQ=0,totalC=0;
+    m.topicos.forEach(t=>{
+      totalQ+=(t.qtdQ||0);totalC+=(t.acertosQ||0);
+      (t.subAssuntos||[]).forEach(s=>{
+        totalQ+=(s.qtdQ||0);totalC+=(s.acertosQ||0);
+        (s.filhos||[]).forEach(s2=>{
+          totalQ+=(s2.qtdQ||0);totalC+=(s2.acertosQ||0);
+          (s2.filhos||[]).forEach(s3=>{totalQ+=(s3.qtdQ||0);totalC+=(s3.acertosQ||0);});
+        });
+      });
+    });
     return`<div class="item"><div class="flex" style="flex-wrap:wrap;gap:4px;margin-bottom:6px"><span class="item-title">${m.nome}</span><div class="spacer"></div><span class="dominio-badge ${dm.cls}">${dm.emoji} ${dm.nivel}</span></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:5px;margin-bottom:5px">
         ${m.topicos.map(t=>{const d=calcDominio(t);return`<div style="display:flex;align-items:flex-start;gap:5px;background:var(--bg);border-radius:var(--radius-sm);padding:6px 9px;"><span>${d.emoji}</span><div style="min-width:0;flex:1"><div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.nome}</div><div style="font-size:10px;color:var(--text2)">${t.acertos}% · ${t.qtdQ||0}q · ${t.revisoes||1}rev · ${t.intervalAtual||1}d</div></div></div>`;}).join('')}
@@ -1704,6 +1721,31 @@ function sendNotification(title,body){
 }
 function pomoAlert(msg){playAlert();showToast(msg);sendNotification('Concursos Pro',msg);}
 
+function renderPomodoro(){
+  const sel=document.getElementById('pomoMateria');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— Selecione uma matéria —</option>';
+  data.materias.forEach(m=>{
+    const opt=document.createElement('option');
+    opt.value=m.nome;opt.textContent=m.nome;
+    if(m.nome===cur)opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+function getPomMateria(){
+  const sel=document.getElementById('pomoMateria');
+  return sel?sel.value:'';
+}
+function trackMateriaMin(mins){
+  if(!mins)return;
+  const mat=getPomMateria();if(!mat)return;
+  const today=todayStr();
+  if(!data.materiaMinutos)data.materiaMinutos={};
+  if(!data.materiaMinutos[today])data.materiaMinutos[today]={};
+  data.materiaMinutos[today][mat]=(data.materiaMinutos[today][mat]||0)+mins;
+  save();
+}
 function switchPomo(tab,btn){
   document.querySelectorAll('.pomo-tab').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.pomo-panel').forEach(p=>p.classList.remove('active'));
@@ -1726,6 +1768,7 @@ function togglePomo(){
         clearInterval(pomoInterval);pomoRunning=false;
         if(pomoMode==='focus'){
           pomoSessHoje++;document.getElementById('pomoSessions').textContent=pomoSessHoje;
+          trackMateriaMin(getFoco()); // registra minutos na matéria selecionada
           pomoMode='break';pomoSeconds=getBreak();
           document.getElementById('pomoLabel').textContent='☕ Pausa';
           document.getElementById('pomoBtn').textContent='▶ Iniciar';
@@ -1819,9 +1862,10 @@ function render(){
   else if(id==='metas')renderMetas();
   else if(id==='stats')renderStats();
   else if(id==='simulados')renderSimulados();
+  else if(id==='pomodoro')renderPomodoro();
   else if(id==='config')renderConfig();
 }
-function renderAll(){renderDash();renderMaterias();renderRevisoes();renderEdital();renderMetas();}
+function renderAll(){renderDash();renderMaterias();renderRevisoes();renderEdital();renderMetas();renderPomodoro();}
 
 // ==================== CONFIGURAÇÕES ====================
 const CORES=[
